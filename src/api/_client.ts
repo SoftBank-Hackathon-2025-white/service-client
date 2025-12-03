@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '../constants/api';
 
-// TODO: axios 인스턴스 생성 (예시로 해놨기에 추후 백엔드와 맞춰 변경 필요)
 const client = axios.create({ baseURL: BASE_URL + '/api/v1' });
 
 client.interceptors.response.use(
