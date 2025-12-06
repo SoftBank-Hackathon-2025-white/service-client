@@ -22,15 +22,14 @@ const INITIAL_STATE: State = {
 } as const;
 
 // 기본
-const usePersonStore = create<State & Action>((set) => ({
+export const usePersonStore = create<State & Action>((set) => ({
   ...INITIAL_STATE,
   updateFirstName: (firstName) => set(() => ({ firstName: firstName })),
   updateLastName: (lastName) => set(() => ({ lastName: lastName })),
 }));
-type UsePersonStoreType = typeof usePersonStore;
 
 // Immer 사용 시 아래와 같이 사용
-const usePersonStoreWithImmer = create<State & Action>()(
+export const usePersonStoreWithImmer = create<State & Action>()(
   immer((set) => ({
     ...INITIAL_STATE,
     updateFirstName: (firstName) =>
@@ -43,4 +42,3 @@ const usePersonStoreWithImmer = create<State & Action>()(
       }),
   }))
 );
-type UsePersonStoreWithImmerType = typeof usePersonStoreWithImmer;
