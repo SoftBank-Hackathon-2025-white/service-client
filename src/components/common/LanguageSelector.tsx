@@ -15,7 +15,7 @@ export function LanguageSelector({ value, onChange, disabled = false }: Language
   const languages = [
     { value: 'python', label: 'Python', icon: '🐍' },
     { value: 'node', label: 'JavaScript', icon: '💛' },
-    { value: 'java', label: 'Java', icon: '💙' },
+    { value: 'java', label: 'Java', icon: '☕️' },
   ];
 
   return (
@@ -35,15 +35,13 @@ export function LanguageSelector({ value, onChange, disabled = false }: Language
             $isSelected={value === lang.value}
           >
             <LanguageIcon>{lang.icon}</LanguageIcon>
-            <LanguageName $isSelected={value === lang.value}>
-              {lang.label}
-            </LanguageName>
+            <LanguageName $isSelected={value === lang.value}>{lang.label}</LanguageName>
           </LanguageButton>
         ))}
       </LanguageGrid>
 
       <SelectedInfo>
-        ✓ 선택된 언어: <strong>{languages.find(l => l.value === value)?.label}</strong>
+        ✓ 선택된 언어: <strong>{languages.find((l) => l.value === value)?.label}</strong>
       </SelectedInfo>
     </Container>
   );
@@ -76,16 +74,14 @@ const LanguageGrid = styled.div`
 const LanguageButton = styled.button<{ $isSelected: boolean }>`
   padding: ${(props) => props.theme.spacing.md};
   border-radius: ${(props) => props.theme.borderRadius.xl};
-  border: 2px solid ${(props) => 
-    props.$isSelected ? props.theme.color.green1 : props.theme.color.cardBorder};
-  background: ${(props) => 
-    props.$isSelected ? props.theme.color.baseColor3 : props.theme.color.baseColor2};
+  border: 2px solid ${(props) => (props.$isSelected ? props.theme.color.green1 : props.theme.color.cardBorder)};
+  background: ${(props) => (props.$isSelected ? props.theme.color.baseColor3 : props.theme.color.baseColor2)};
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: ${(props) => props.theme.spacing.sm};
   transition: all 0.2s;
-  box-shadow: ${(props) => props.$isSelected ? props.theme.shadow.md : 'none'};
+  box-shadow: ${(props) => (props.$isSelected ? props.theme.shadow.md : 'none')};
 
   &:hover:not(:disabled) {
     border-color: ${(props) => props.theme.color.green1};
@@ -104,9 +100,8 @@ const LanguageIcon = styled.span`
 
 const LanguageName = styled.span<{ $isSelected: boolean }>`
   font-size: ${(props) => props.theme.fontSize.sm};
-  color: ${(props) => 
-    props.$isSelected ? props.theme.color.green1 : props.theme.color.baseColor6};
-  font-weight: ${(props) => props.$isSelected ? 600 : 400};
+  color: ${(props) => (props.$isSelected ? props.theme.color.green1 : props.theme.color.baseColor6)};
+  font-weight: ${(props) => (props.$isSelected ? 600 : 400)};
 `;
 
 const SelectedInfo = styled.div`
