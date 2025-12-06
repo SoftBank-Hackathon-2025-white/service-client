@@ -156,10 +156,10 @@ export const handlers = [
     const newProject: Project = {
       id: `proj-${Date.now()}`,
       name: body.name,
-      description: body.description,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       jobCount: 0,
+      ...(body.description && { description: body.description }),
     };
 
     mockProjects = [newProject, ...mockProjects];
