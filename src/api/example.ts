@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ExampleRequest, ExampleResponse } from '../types/api';
+import type { ExampleRequest, ExampleResponse } from '../types/api';
 import client from './_client';
 
 /**

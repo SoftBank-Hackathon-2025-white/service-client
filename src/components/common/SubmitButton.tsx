@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { Play, Loader2 } from 'lucide-react';
-import React from 'react';
 
 interface SubmitButtonProps {
   onClick: () => void;

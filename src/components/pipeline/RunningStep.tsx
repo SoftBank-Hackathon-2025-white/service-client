@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Play, CheckCircle } from 'lucide-react';
-import React from 'react';
 
 interface RunningStepProps {
   status: 'pending' | 'active' | 'completed';

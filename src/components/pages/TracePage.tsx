@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components'; 
 import { motion } from 'framer-motion';
@@ -451,20 +450,6 @@ const ErrorDescription = styled.p`
   margin-bottom: ${(props) => props.theme.spacing.md};
 `;
 
-const ErrorLog = styled.div`
-  background: rgba(127, 29, 29, 0.1);
-  border: 1px solid #fecaca;
-  border-radius: ${(props) => props.theme.borderRadius.xl};
-  padding: ${(props) => props.theme.spacing.md};
-  
-  pre {
-    font-size: ${(props) => props.theme.fontSize.sm};
-    color: #991b1b;
-    white-space: pre-wrap;
-    font-family: monospace;
-  }
-`;
-
 const ErrorActions = styled.div`
   margin-top: ${(props) => props.theme.spacing.lg};
   text-align: center;
@@ -617,37 +602,6 @@ const InfoText = styled.span`
   font-size: ${(props) => props.theme.fontSize.sm};
   color: ${(props) => props.theme.color.white};
 `;
-
-const ResultCard = styled(motion.div)`
-  background: ${(props) => props.theme.color.white};
-  border-radius: ${(props) => props.theme.borderRadius['2xl']};
-  padding: ${(props) => props.theme.spacing.lg};
-  border: 1px solid ${(props) => props.theme.color.border2};
-  box-shadow: ${(props) => props.theme.shadow.sm};
-  margin-bottom: ${(props) => props.theme.spacing.lg};
-`;
-
-const ResultTitle = styled.h3`
-  font-size: ${(props) => props.theme.fontSize.lg};
-  font-weight: 600;
-  color: ${(props) => props.theme.color.baseColor2};
-  margin-bottom: ${(props) => props.theme.spacing.sm};
-`;
-
-const ResultOutput = styled.div`
-  background: ${(props) => props.theme.color.skyBg1};
-  border-radius: ${(props) => props.theme.borderRadius.xl};
-  padding: ${(props) => props.theme.spacing.sm};
-  border: 1px solid ${(props) => props.theme.color.border1};
-
-  pre {
-    font-size: ${(props) => props.theme.fontSize.sm};
-    color: ${(props) => props.theme.color.baseColor2};
-    white-space: pre-wrap;
-    font-family: monospace;
-  }
-`;
-
 
 const ActionButtons = styled(motion.div)`
   display: flex;

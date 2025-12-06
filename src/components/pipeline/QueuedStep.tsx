@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Clock, CheckCircle } from 'lucide-react';
-import React from 'react';
 
 interface QueuedStepProps {
   status: 'pending' | 'active' | 'completed';

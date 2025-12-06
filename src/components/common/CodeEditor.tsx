@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { FileCode, Sparkles } from 'lucide-react';
-import React from 'react';
 
 interface CodeEditorProps {
   value: string;

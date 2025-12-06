@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { Code } from 'lucide-react';
-import React from 'react';
 
 interface LanguageSelectorProps {
   value: string;
