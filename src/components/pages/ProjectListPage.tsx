@@ -25,9 +25,10 @@ export function ProjectListPage() {
     }
 
     try {
+      const trimmedDescription = newProjectDescription.trim();
       const project = await createProjectMutation.mutateAsync({
         name: newProjectName.trim(),
-        description: newProjectDescription.trim() || undefined,
+        ...(trimmedDescription && { description: trimmedDescription }),
       });
       setIsModalOpen(false);
       setNewProjectName('');

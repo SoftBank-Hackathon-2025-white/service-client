@@ -22,8 +22,11 @@ export const executionKeys = {
 export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmitResponse> => {
   const { projectId, code, language } = request;
 
+  // 개행문자(\n, \r) 제거
+  const sanitizedCode = code.replace(/[\r\n]/g, '');
+
   // 1. 업로드
-  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD(projectId), { code, language });
+  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD(projectId), { code: sanitizedCode, language });
   const uploadData = uploadResponse.data as any;
 
   const jobId: string = uploadData.job_id || uploadData.jobId;
