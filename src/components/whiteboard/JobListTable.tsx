@@ -6,15 +6,13 @@ import StatusBadge from '../common/StatusBadge';
 
 interface JobListTableProps {
   jobs: JobMetadata[];
+  onJobClick?: (jobId: string) => void;
 }
 
-const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
+const JobListTable: React.FC<JobListTableProps> = ({ jobs, onJobClick }) => {
   const [filterStatus, setFilterStatus] = useState<JobStatus | 'ALL'>('ALL');
 
-  const filteredJobs =
-    filterStatus === 'ALL'
-      ? jobs
-      : jobs.filter((job) => job.status === filterStatus);
+  const filteredJobs = filterStatus === 'ALL' ? jobs : jobs.filter((job) => job.status === filterStatus);
 
   const formatDuration = (duration?: number) => {
     if (!duration) return '-';
@@ -41,18 +39,11 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
       <Header>
         <Title>최근 실행 이력</Title>
         <FilterContainer>
-          <FilterButton
-            $active={filterStatus === 'ALL'}
-            onClick={() => setFilterStatus('ALL')}
-          >
+          <FilterButton $active={filterStatus === 'ALL'} onClick={() => setFilterStatus('ALL')}>
             전체
           </FilterButton>
           {Object.values(JobStatus).map((status) => (
-            <FilterButton
-              key={status}
-              $active={filterStatus === status}
-              onClick={() => setFilterStatus(status)}
-            >
+            <FilterButton key={status} $active={filterStatus === status} onClick={() => setFilterStatus(status)}>
               {status}
             </FilterButton>
           ))}
@@ -79,7 +70,7 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
               </tr>
             ) : (
               filteredJobs.map((job) => (
-                <Tr key={job.id}>
+                <Tr key={job.id} $clickable={!!onJobClick} onClick={() => onJobClick?.(job.id)}>
                   <Td>
                     <JobId>{job.id.substring(0, 8)}</JobId>
                   </Td>
@@ -140,14 +131,11 @@ const FilterButton = styled.button<{ $active: boolean }>`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${({ $active, theme }) =>
-    $active ? theme.color.green1 : theme.color.baseColor3};
-  color: ${({ $active, theme }) =>
-    $active ? theme.color.baseColor1 : theme.color.baseColor7};
+  background: ${({ $active, theme }) => ($active ? theme.color.green1 : theme.color.baseColor3)};
+  color: ${({ $active, theme }) => ($active ? theme.color.baseColor1 : theme.color.baseColor7)};
 
   &:hover {
-    background: ${({ $active, theme }) =>
-      $active ? theme.color.greenDeep : theme.color.baseColor4};
+    background: ${({ $active, theme }) => ($active ? theme.color.greenDeep : theme.color.baseColor4)};
     color: ${(props) => props.theme.color.white};
   }
 `;
@@ -172,8 +160,9 @@ const Th = styled.th`
   border-bottom: 2px solid ${(props) => props.theme.color.baseColor3};
 `;
 
-const Tr = styled.tr`
+const Tr = styled.tr<{ $clickable?: boolean }>`
   transition: all 0.2s ease;
+  cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
 
   &:hover {
     background: ${(props) => props.theme.color.baseColor2};

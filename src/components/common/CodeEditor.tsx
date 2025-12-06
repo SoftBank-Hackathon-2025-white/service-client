@@ -5,12 +5,12 @@ const guideAnnotation = {
   python: '# Python 코드를 입력하세요',
   node: '// JavaScript 코드를 입력하세요',
   java: '// Java 코드를 입력하세요',
-}
+};
 
 const exampleCode: Record<string, string> = {
   python: 'print("Hello, Snowflake!")',
   node: 'console.log("Hello, Snowflake!");',
-  java: 'public static void main(String[] args) {/n System.out.println("Hello, Snowflake!");/n }',
+  java: 'public static void main(String[] args) { System.out.println("Hello, Snowflake!"); }',
 };
 interface CodeEditorProps {
   value: string;
@@ -32,11 +32,7 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
           <span>코드 입력</span>
         </Label>
 
-        <ExampleButton
-          type="button"
-          onClick={handleLoadExample}
-          disabled={disabled}
-        >
+        <ExampleButton type="button" onClick={handleLoadExample} disabled={disabled}>
           <Sparkles size={16} />
           <span>예시 코드</span>
         </ExampleButton>
@@ -50,14 +46,12 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
           placeholder={`${guideAnnotation[language]}\n\n예:\n${exampleCode[language]}`}
         />
 
-        <LineCount>
-          {value.split('\n').length} lines
-        </LineCount>
+        <LineCount>{value.split('\n').length} lines</LineCount>
       </EditorWrapper>
 
       <TipMessage>
-        💡 <strong>Tip:</strong> Tab 키로 들여쓰기를 할 수 있습니다. 
-        코드를 입력한 후 하단의 "Snowflake 실행" 버튼을 클릭하세요.
+        💡 <strong>Tip:</strong> Tab 키로 들여쓰기를 할 수 있습니다. 코드를 입력한 후 하단의 "Snowflake 실행" 버튼을
+        클릭하세요.
       </TipMessage>
     </Container>
   );

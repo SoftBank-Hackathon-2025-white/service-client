@@ -4,14 +4,18 @@ export const BASE_URL = 'http://54.180.234.73:8000';
 
 /**
  * API 엔드포인트 상수
- *
- * 백엔드 문서 기준:
- * - POST /api/upload
- * - POST /api/execute/{job_id}
- * - GET  /api/status/{job_id}
  */
 export const API_ENDPOINTS = {
-  UPLOAD: '/api/upload',
-  EXECUTE: (jobId: string) => `/api/execute/${jobId}`,
-  STATUS: (jobId: string) => `/api/status/${jobId}`,
+  /** 프로젝트 목록 */
+  PROJECTS: '/api/projects',
+  /** 프로젝트 상세 */
+  PROJECT_DETAIL: (projectId: string) => `/api/projects/${projectId}`,
+  /** 프로젝트 대시보드 데이터 */
+  PROJECT_DASHBOARD: (projectId: string) => `/api/projects/${projectId}/dashboard`,
+  /** 코드 업로드 (프로젝트 산하) */
+  UPLOAD: (projectId: string) => `/api/projects/${projectId}/upload`,
+  /** 실행 트리거 */
+  EXECUTE: (projectId: string, jobId: string) => `/api/projects/${projectId}/jobs/${jobId}/execute`,
+  /** 실행 상태 조회 */
+  STATUS: (projectId: string, jobId: string) => `/api/projects/${projectId}/jobs/${jobId}/status`,
 } as const;

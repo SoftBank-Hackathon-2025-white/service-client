@@ -1,29 +1,29 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import client from './_client';
 import { API_ENDPOINTS } from '../constants/api';
+import type { CodeSubmitRequest, CodeSubmitResponse } from '../types/project';
 
 /**
  * Query Keys
  */
 export const executionKeys = {
-  all: ['executions'],
-  detail: (jobId: string) => ['executions', jobId],
-  status: (jobId: string) => ['executions', jobId, 'status'],
+  all: ['executions'] as const,
+  detail: (projectId: string, jobId: string) => ['executions', projectId, jobId] as const,
+  status: (projectId: string, jobId: string) => ['executions', projectId, jobId, 'status'] as const,
 };
 
 /**
  * 코드 제출 API
  *
- * 1) POST /api/upload  로 코드 업로드
- * 2) POST /api/execute/{job_id} 로 실행 트리거
- * 3) 최종적으로 { jobId } 반환
+ * 1) POST /api/projects/{projectId}/upload 로 코드 업로드
+ * 2) POST /api/projects/{projectId}/jobs/{job_id}/execute 로 실행 트리거
+ * 3) 최종적으로 { jobId, projectId } 반환
  */
-export const submitCode = async (request: {
-  code: string;
-  language: string;
-}): Promise<{ jobId: string }> => {
+export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmitResponse> => {
+  const { projectId, code, language } = request;
+
   // 1. 업로드
-  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD, request);
+  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD(projectId), { code, language });
   const uploadData = uploadResponse.data as any;
 
   const jobId: string = uploadData.job_id || uploadData.jobId;
@@ -33,25 +33,21 @@ export const submitCode = async (request: {
   }
 
   // 2. 실행 트리거
-  await client.post(API_ENDPOINTS.EXECUTE(jobId));
+  await client.post(API_ENDPOINTS.EXECUTE(projectId, jobId));
 
   // 3. 프론트에서 사용하기 좋은 형태로 반환
-  return { jobId };
+  return { jobId, projectId };
 };
 
 /**
  * 실행 상태 조회 API (GET)
- *
- * @param {string} jobId - Job ID
- * @returns {Promise<Object>} ExecutionInfo
  */
-const fetchExecutionStatus = async (jobId: string) => {
-  const response = await client.get(API_ENDPOINTS.STATUS(jobId));
+const fetchExecutionStatus = async (projectId: string, jobId: string) => {
+  const response = await client.get(API_ENDPOINTS.STATUS(projectId, jobId));
   const data = response.data as any;
 
   // 백엔드 status 값을 프론트에서 쓰는 값으로 매핑
-  const rawStatus: string =
-    data.status ?? data.state ?? data.phase ?? 'QUEUED';
+  const rawStatus: string = data.status ?? data.state ?? data.phase ?? 'QUEUED';
   const normalized = rawStatus.toUpperCase();
 
   let status: 'Uploading' | 'Queued' | 'Running' | 'Success' | 'Failed';
@@ -104,11 +100,11 @@ const fetchExecutionStatus = async (jobId: string) => {
   }
 
   return {
+    projectId,
     jobId,
     status,
     progress: Math.min(progress, 100),
-    createdAt:
-      data.created_at || data.createdAt || new Date().toISOString(),
+    createdAt: data.created_at || data.createdAt || new Date().toISOString(),
     completedAt: data.completed_at || data.completedAt,
     result: data.result || {
       output: data.output,
@@ -121,23 +117,17 @@ const fetchExecutionStatus = async (jobId: string) => {
 
 /**
  * 실행 상태 조회 React Query Hook (GET)
- *
- * @param {string|null} jobId - Job ID
- * @param {boolean} enabled - 쿼리 활성화 여부
- * @param {number} refetchInterval - 폴링 간격 (ms)
- *
- * 사용 예시:
- * const { data, isLoading } = useExecutionStatus(jobId, true, 1000);
  */
 export const useExecutionStatus = (
+  projectId: string | null,
   jobId: string | null,
   enabled = true,
   refetchInterval = 3000
 ) => {
   return useQuery({
-    queryKey: executionKeys.status(jobId || ''),
-    queryFn: () => fetchExecutionStatus(jobId!),
-    enabled: enabled && !!jobId,
+    queryKey: executionKeys.status(projectId || '', jobId || ''),
+    queryFn: () => fetchExecutionStatus(projectId!, jobId!),
+    enabled: enabled && !!projectId && !!jobId,
     refetchInterval: (query) => {
       const data = query.state.data as any;
       // Success 또는 Failed 상태면 폴링 중지
@@ -147,27 +137,21 @@ export const useExecutionStatus = (
       return refetchInterval;
     },
     retry: false,
-    staleTime: 0, // 항상 fresh하지 않도록
+    staleTime: 0,
   });
 };
 
 /**
  * Query Invalidation 헬퍼 함수
- *
- * POST/PUT/DELETE 후 호출하여 캐시 무효화
- *
- * 사용 예시:
- * const queryClient = useQueryClient();
- * await submitCode(data);
- * invalidateExecutionQueries(queryClient, jobId);
  */
 export const invalidateExecutionQueries = (
   queryClient: ReturnType<typeof useQueryClient>,
+  projectId?: string | null,
   jobId?: string | null
 ) => {
-  if (jobId) {
-    queryClient.invalidateQueries({ queryKey: executionKeys.status(jobId) });
-    queryClient.invalidateQueries({ queryKey: executionKeys.detail(jobId) });
+  if (projectId && jobId) {
+    queryClient.invalidateQueries({ queryKey: executionKeys.status(projectId, jobId) });
+    queryClient.invalidateQueries({ queryKey: executionKeys.detail(projectId, jobId) });
   } else {
     queryClient.invalidateQueries({ queryKey: executionKeys.all });
   }

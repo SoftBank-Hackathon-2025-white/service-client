@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components'; 
+import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { useExecutionStatus } from '../../api/execution';
-import { PATHS } from '../../constants/paths';
+import { getProjectPath } from '../../constants/paths';
 import { UploadingStep } from '../pipeline/UploadingStep';
 import { QueuedStep } from '../pipeline/QueuedStep';
 import { RunningStep } from '../pipeline/RunningStep';
@@ -15,11 +15,27 @@ import { CompletedStep } from '../pipeline/CompletedStep';
  * 성공 시에는 하단에 완료 정보도 함께 표시
  */
 export function TracePage() {
-  const { jobId } = useParams();
+  const { projectId, jobId } = useParams();
   const navigate = useNavigate();
-  
+
   // 실행 상태 조회 (1초마다 폴링)
-  const { data: executionInfo, isLoading } = useExecutionStatus(jobId || null, true, 1000);
+  const { data: executionInfo, isLoading } = useExecutionStatus(projectId || null, jobId || null, true, 1000);
+
+  const handleBackToProject = () => {
+    if (projectId) {
+      navigate(getProjectPath(projectId));
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleGoToHistory = () => {
+    if (projectId) {
+      navigate(`${getProjectPath(projectId)}?tab=history`);
+    } else {
+      navigate('/');
+    }
+  };
 
   if (isLoading || !executionInfo) {
     return (
@@ -39,8 +55,12 @@ export function TracePage() {
     const currentIndex = statusOrder.indexOf(status);
     const stepIndex = statusOrder.indexOf(stepName);
 
-    if (currentIndex > stepIndex) return 'completed';
-    if (currentIndex === stepIndex) return 'active';
+    if (currentIndex > stepIndex) {
+      return 'completed';
+    }
+    if (currentIndex === stepIndex) {
+      return 'active';
+    }
     return 'pending';
   };
 
@@ -67,18 +87,25 @@ export function TracePage() {
   return (
     <Container>
       <ContentWrapper>
-        {/* Job ID 헤더 */}
-        <JobIdHeader
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 200 }}
-        >
-          <StatusDot />
-          <JobIdInfo>
-            <JobIdLabel>Job ID</JobIdLabel>
-            <JobIdCode>{jobId}</JobIdCode>
-          </JobIdInfo>
-        </JobIdHeader>
+        {/* 헤더 영역: 뒤로가기 + Job ID */}
+        <HeaderRow>
+          <BackLink onClick={handleBackToProject}>
+            <ArrowLeft size={20} />
+            프로젝트로 돌아가기
+          </BackLink>
+
+          <JobIdHeader
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200 }}
+          >
+            <StatusDot />
+            <JobIdInfo>
+              <JobIdLabel>Job ID</JobIdLabel>
+              <JobIdCode>{jobId}</JobIdCode>
+            </JobIdInfo>
+          </JobIdHeader>
+        </HeaderRow>
 
         {/* 실패가 아닐 때: 파이프라인/진행률 표시 */}
         {!isFailed && (
@@ -99,10 +126,7 @@ export function TracePage() {
             </ProgressCard>
 
             {/* 상태 메시지 */}
-            <StatusMessage
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+            <StatusMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <StatusDotSmall />
               {getStatusMessage()}
             </StatusMessage>
@@ -119,35 +143,24 @@ export function TracePage() {
 
         {/* 실행 실패 */}
         {isFailed && (
-          <ErrorCard
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
+          <ErrorCard initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
             <ErrorContent>
               <AlertCircle size={48} color="#ef4444" />
               <ErrorInfo>
                 <ErrorTitle>실행 실패</ErrorTitle>
-                <ErrorDescription>
-                  코드 실행 중 오류가 발생했습니다.
-                </ErrorDescription>
+                <ErrorDescription>코드 실행 중 오류가 발생했습니다.</ErrorDescription>
               </ErrorInfo>
             </ErrorContent>
-            
+
             <ErrorActions>
-              <BackButton onClick={() => navigate('/')}>
-                처음으로 돌아가기
-              </BackButton>
+              <BackButton onClick={handleBackToProject}>프로젝트로 돌아가기</BackButton>
             </ErrorActions>
           </ErrorCard>
         )}
 
         {/* 성공 시: CompletePage 내용 아래에 표시 */}
         {isSuccess && (
-          <SuccessSection
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
+          <SuccessSection initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <SuccessHeader
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -156,29 +169,23 @@ export function TracePage() {
               <SuccessIcon
                 animate={{
                   rotate: [0, 10, -10, 0],
-                  scale: [1, 1.05, 1]
+                  scale: [1, 1.05, 1],
                 }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  repeatType: 'reverse'
+                  repeatType: 'reverse',
                 }}
               >
                 <CheckCircle2 size={56} color="white" />
               </SuccessIcon>
 
               <SuccessTitle>실행 완료!</SuccessTitle>
-              <SuccessSubtitle>
-                코드가 성공적으로 실행되었습니다
-              </SuccessSubtitle>
+              <SuccessSubtitle>코드가 성공적으로 실행되었습니다</SuccessSubtitle>
             </SuccessHeader>
 
             {/* Job 정보 카드 */}
-            <InfoCard
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
+            <InfoCard initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
               <InfoCardHeader>
                 <SuccessStatusDot />
                 <InfoCardTitle>Job 정보</InfoCardTitle>
@@ -195,45 +202,19 @@ export function TracePage() {
                 {executionInfo?.completedAt && (
                   <InfoItem>
                     <InfoLabel>완료 시간</InfoLabel>
-                    <InfoText>
-                      {new Date(executionInfo.completedAt).toLocaleString('ko-KR')}
-                    </InfoText>
+                    <InfoText>{new Date(executionInfo.completedAt).toLocaleString('ko-KR')}</InfoText>
                   </InfoItem>
                 )}
               </InfoList>
             </InfoCard>
 
-            {/* 실행 결과 미리보기 (원하면 주석 해제해서 사용) */}
-            {/* {executionInfo?.result && (
-              <ResultCard
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <ResultTitle>실행 결과</ResultTitle>
-                <ResultOutput>
-                  <pre>{executionInfo.result.output || '(출력 없음)'}</pre>
-                </ResultOutput>
-              </ResultCard>
-            )} */}
-
             {/* 액션 버튼 */}
-            <ActionButtons
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              <ActionButton onClick={() => navigate(PATHS.WHITEBOARD)}>
-                대시보드 보기
-              </ActionButton>
+            <ActionButtons initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
+              <ActionButton onClick={handleGoToHistory}>실행 이력 보기</ActionButton>
             </ActionButtons>
 
             {/* 푸터 메시지 */}
-            <FooterMessage
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
+            <FooterMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
               ❄️ Snowflake - 순수하고 투명한 서버리스 실행 완료
             </FooterMessage>
           </SuccessSection>
@@ -241,14 +222,9 @@ export function TracePage() {
 
         {/* 투명성 메시지 (실패 제외 전체) */}
         {!isFailed && (
-          <InfoMessage
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            ❄️ <strong>Pure & Transparent:</strong> 
-            모든 실행 과정이 투명하게 공개됩니다. 
-
+          <InfoMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            ❄️ <strong>Pure & Transparent:</strong>
+            모든 실행 과정이 투명하게 공개됩니다.
           </InfoMessage>
         )}
       </ContentWrapper>
@@ -273,6 +249,34 @@ const ContentWrapper = styled.div`
   margin: 0 auto;
 `;
 
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${(props) => props.theme.spacing.xl};
+  flex-wrap: wrap;
+  gap: 16px;
+`;
+
+const BackLink = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: ${(props) => props.theme.color.baseColor6};
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${(props) => props.theme.color.baseColor3};
+    color: ${(props) => props.theme.color.white};
+  }
+`;
+
 const LoadingWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -291,7 +295,9 @@ const Spinner = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -310,7 +316,6 @@ const JobIdHeader = styled(motion.div)`
   border-radius: ${(props) => props.theme.borderRadius['2xl']};
   border: 1px solid ${(props) => props.theme.color.cardBorder};
   box-shadow: ${(props) => props.theme.shadow.sm};
-  margin-bottom: ${(props) => props.theme.spacing.xl};
 `;
 
 const StatusDot = styled.div`
@@ -321,8 +326,13 @@ const StatusDot = styled.div`
   animation: pulse 2s ease-in-out infinite;
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 `;
 
@@ -386,11 +396,7 @@ const ProgressBarWrapper = styled.div`
 
 const ProgressBar = styled(motion.div)`
   height: 100%;
-  background: linear-gradient(
-    to right,
-    ${(props) => props.theme.color.green1},
-    ${(props) => props.theme.color.green2}
-  );
+  background: linear-gradient(to right, ${(props) => props.theme.color.green1}, ${(props) => props.theme.color.green2});
 `;
 
 const StatusMessage = styled(motion.div)`
@@ -486,7 +492,7 @@ const InfoMessage = styled(motion.div)`
   }
 `;
 
-/* ---------------- 성공 섹션 스타일 (기존 CompletePage 것 재활용) ---------------- */
+/* ---------------- 성공 섹션 스타일 ---------------- */
 
 const SuccessSection = styled(motion.div)`
   margin-top: ${(props) => props.theme.spacing.xl};
@@ -616,11 +622,7 @@ const ActionButton = styled.button`
   gap: ${(props) => props.theme.spacing.sm};
   padding: ${(props) => props.theme.spacing.lg} ${(props) => props.theme.spacing.xl};
   min-width: 200px;
-  background: linear-gradient(
-    135deg,
-    ${(props) => props.theme.color.green1},
-    ${(props) => props.theme.color.green2}
-  );
+  background: linear-gradient(135deg, ${(props) => props.theme.color.green1}, ${(props) => props.theme.color.green2});
   color: ${(props) => props.theme.color.baseColor1};
   border-radius: ${(props) => props.theme.borderRadius.xl};
   font-weight: 700;
