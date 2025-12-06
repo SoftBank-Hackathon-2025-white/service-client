@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { WhiteboardData } from '../types/whiteboard';
 import { JobStatus } from '../types/whiteboard';
+import { BASE_URL } from '../constants/api';
 
 const generateResourceHistory = () => {
   const history = [];
@@ -15,10 +16,8 @@ const generateResourceHistory = () => {
   return history;
 };
 
-const API_BASE_URL = import.meta.env['VITE_API_BASE_URL'] || 'http://localhost:8080';
-
 export const handlers = [
-  http.get(`${API_BASE_URL}/api/v1/whiteboard`, () => {
+  http.get(`${BASE_URL}/whiteboard`, () => {
     const mockData: WhiteboardData = {
       systemMetrics: {
         activeJobsCount: 5,

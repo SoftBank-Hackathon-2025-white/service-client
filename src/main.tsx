@@ -10,6 +10,7 @@ import Whiteboard from './components/pages/Whiteboard.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HomePage } from './components/pages/HomePage.jsx';
 import { TracePage } from './components/pages/TracePage.jsx';
+
 async function enableMocking() {
   if (import.meta.env['VITE_ENABLE_MSW'] === 'true') {
     const { worker } = await import('./mocks/browser');
