@@ -1,6 +1,17 @@
 import styled from 'styled-components';
 import { FileCode, Sparkles } from 'lucide-react';
 
+const guideAnnotation = {
+  python: '# Python 코드를 입력하세요',
+  node: '// JavaScript 코드를 입력하세요',
+  java: '// Java 코드를 입력하세요',
+}
+
+const exampleCode: Record<string, string> = {
+  python: 'print("Hello, Snowflake!")',
+  node: 'console.log("Hello, Snowflake!");',
+  java: 'public static void main(String[] args) {/n System.out.println("Hello, Snowflake!");/n }',
+};
 interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -9,13 +20,6 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ value, onChange, language, disabled = false }: CodeEditorProps) {
-  const exampleCode: Record<string, string> = {
-    python: '# Python 코드를 입력하세요\nprint("Hello, Snowflake!")',
-    javascript: '// JavaScript 코드를 입력하세요\nconsole.log("Hello, Snowflake!");',
-    java: '//  Java 코드를 입력하세요\npublic static void main(String[] args) {/n System.out.println("Hello, Snowflake!");/n }',
-    
-  };
-
   const handleLoadExample = () => {
     onChange(exampleCode[language] || '');
   };
@@ -43,7 +47,7 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          placeholder={`${language} 코드를 입력하세요...\n\n예:\n${exampleCode[language]}`}
+          placeholder={`${guideAnnotation[language]}\n\n예:\n${exampleCode[language]}`}
         />
 
         <LineCount>
