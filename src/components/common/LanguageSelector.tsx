@@ -14,8 +14,8 @@ interface LanguageSelectorProps {
 export function LanguageSelector({ value, onChange, disabled = false }: LanguageSelectorProps) {
   const languages = [
     { value: 'python', label: 'Python', icon: '🐍' },
-    { value: 'javascript', label: 'JavaScript', icon: '💛' },
-    { value: 'Java', label: 'Java', icon: '💙' }
+    { value: 'node', label: 'JavaScript', icon: '💛' },
+    { value: 'java', label: 'Java', icon: '💙' },
   ];
 
   return (

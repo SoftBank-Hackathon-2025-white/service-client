@@ -15,7 +15,7 @@ import { getExecutionPath } from '../../constants/paths';
 export function HomePage() {
   const navigate = useNavigate();
   
-  const [language, setLanguage] = useState<'python' | 'javascript' | 'java'>('python');
+  const [language, setLanguage] = useState<'python' | 'node' | 'java'>('python');
   const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,7 +59,7 @@ export function HomePage() {
         <FormSection>
           <LanguageSelector
             value={language}
-            onChange={(lang) => setLanguage(lang as 'python' | 'javascript' | 'java')}
+            onChange={(lang) => setLanguage(lang as 'python' | 'node' | 'java')}
             disabled={isSubmitting}
           />
 

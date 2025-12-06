@@ -4,7 +4,7 @@ import { FileCode, Sparkles } from 'lucide-react';
 interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
-  language: 'python' | 'javascript' | 'java';
+  language: 'python' | 'node' | 'java';
   disabled?: boolean;
 }
 
