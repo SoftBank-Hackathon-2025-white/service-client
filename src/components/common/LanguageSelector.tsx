@@ -9,13 +9,13 @@ interface LanguageSelectorProps {
 
 /**
  * 프로그래밍 언어 선택 컴포넌트
- * Python, JavaScript, TypeScript 중 선택
+ * Python, JavaScript, Java 중 선택
  */
 export function LanguageSelector({ value, onChange, disabled = false }: LanguageSelectorProps) {
   const languages = [
     { value: 'python', label: 'Python', icon: '🐍' },
     { value: 'javascript', label: 'JavaScript', icon: '💛' },
-    { value: 'typescript', label: 'TypeScript', icon: '💙' }
+    { value: 'Java', label: 'Java', icon: '💙' }
   ];
 
   return (

@@ -4,7 +4,7 @@ import { FileCode, Sparkles } from 'lucide-react';
 interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
-  language: 'python' | 'javascript' | 'typescript';
+  language: 'python' | 'javascript' | 'java';
   disabled?: boolean;
 }
 
@@ -12,7 +12,8 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
   const exampleCode: Record<string, string> = {
     python: '# Python 코드를 입력하세요\nprint("Hello, Snowflake!")',
     javascript: '// JavaScript 코드를 입력하세요\nconsole.log("Hello, Snowflake!");',
-    typescript: '// TypeScript 코드를 입력하세요\nconst message = "Hello, Snowflake!";\nconsole.log(message);',
+    java: '//  Java 코드를 입력하세요\npublic static void main(String[] args) {/n System.out.println("Hello, Snowflake!");/n }',
+    
   };
 
   const handleLoadExample = () => {

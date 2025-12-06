@@ -1,7 +1,10 @@
 import axios, { AxiosError } from 'axios';
 import { BASE_URL } from '../constants/api';
 
-const client = axios.create({ baseURL: BASE_URL + '/api/v1' });
+// BASE_URL 는 실제 API 서버의 루트 주소만 가지도록 합니다.
+// 예) VITE_API_BASE_URL=http://54.180.234.73:8000
+// 각 요청에서는 '/api/...' 와 같이 전체 경로를 지정합니다.
+const client = axios.create({ baseURL: BASE_URL });
 
 client.interceptors.response.use(
   (response) => response,
