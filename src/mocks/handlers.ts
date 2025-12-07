@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { ProjectListResponse, ProjectDetailData, Project } from '../types/project';
-import { JobStatus, type JobMetadata, type CloudWatchResponse } from '../types/whiteboard';
+import { JobStatus, type JobMetadata, type CloudWatchResponse, type JobStatusResponse } from '../types/whiteboard';
 import { BASE_URL } from '../constants/api';
 
 /**
@@ -282,64 +282,63 @@ export const handlers = [
 
   /**
    * 실행 상태 조회
-   * GET /api/projects/:projectId/jobs/:jobId/status
+   * GET /api/jobs/:jobId/status
    */
-  http.get(`${BASE_URL}/api/projects/:projectId/jobs/:jobId/status`, ({ params }) => {
-    const { projectId, jobId } = params as { projectId: string; jobId: string };
+  http.get(`${BASE_URL}/api/jobs/:jobId/status`, ({ params }) => {
+    const { jobId } = params as { jobId: string };
+
+    // jobId에서 projectId 추출
+    const parts = jobId.split('-job-');
+    const projectId = parts[0] || 'unknown-project';
     const key = `${projectId}-${jobId}`;
 
     // 상태 시뮬레이션
     if (jobStatusStore[key]) {
       const elapsed = Date.now() - jobStatusStore[key].startTime;
+      const createdAt = new Date(jobStatusStore[key].startTime).toISOString();
+      let status: JobStatus;
+      let startedAt: string | undefined;
+      let completedAt: string | undefined;
 
       if (elapsed < 3000) {
-        jobStatusStore[key].status = 'UPLOADING';
-        jobStatusStore[key].progress = 10 + Math.floor((elapsed / 3000) * 15);
+        status = JobStatus.PENDING;
       } else if (elapsed < 6000) {
-        jobStatusStore[key].status = 'QUEUED';
-        jobStatusStore[key].progress = 25 + Math.floor(((elapsed - 3000) / 3000) * 20);
+        status = JobStatus.PENDING;
+        startedAt = new Date(jobStatusStore[key].startTime + 3000).toISOString();
       } else if (elapsed < 12000) {
-        jobStatusStore[key].status = 'RUNNING';
-        jobStatusStore[key].progress = 45 + Math.floor(((elapsed - 6000) / 6000) * 50);
+        status = JobStatus.RUNNING;
+        startedAt = new Date(jobStatusStore[key].startTime + 3000).toISOString();
       } else {
-        jobStatusStore[key].status = 'SUCCESS';
-        jobStatusStore[key].progress = 100;
+        status = JobStatus.SUCCESS;
+        startedAt = new Date(jobStatusStore[key].startTime + 3000).toISOString();
+        completedAt = new Date().toISOString();
       }
 
-      return HttpResponse.json({
+      const response: JobStatusResponse = {
         job_id: jobId,
-        project_id: projectId,
-        status: jobStatusStore[key].status,
-        progress: jobStatusStore[key].progress,
-        created_at: new Date(jobStatusStore[key].startTime).toISOString(),
-        completed_at: jobStatusStore[key].status === 'SUCCESS' ? new Date().toISOString() : undefined,
-        result:
-          jobStatusStore[key].status === 'SUCCESS'
-            ? {
-                output: 'Hello, Snowflake!\n실행이 완료되었습니다.',
-                executionTime: elapsed,
-                memoryUsage: 128,
-                cpuUsage: 45,
-              }
-            : undefined,
-      });
+        status,
+        project: projectId,
+        created_at: createdAt,
+        ...(startedAt && { started_at: startedAt }),
+        ...(completedAt && { completed_at: completedAt }),
+        timeout_ms: 300000, // 5분
+      };
+
+      return HttpResponse.json(response);
     }
 
-    // 기존 Job (Mock)
-    return HttpResponse.json({
+    // 기존 Job (Mock) - 완료된 상태로 반환
+    const response: JobStatusResponse = {
       job_id: jobId,
-      project_id: projectId,
-      status: 'SUCCESS',
-      progress: 100,
+      status: JobStatus.SUCCESS,
+      project: projectId,
       created_at: new Date(Date.now() - 60000).toISOString(),
+      started_at: new Date(Date.now() - 55000).toISOString(),
       completed_at: new Date().toISOString(),
-      result: {
-        output: 'Mock execution result',
-        executionTime: 5000,
-        memoryUsage: 64,
-        cpuUsage: 30,
-      },
-    });
+      timeout_ms: 300000,
+    };
+
+    return HttpResponse.json(response);
   }),
 
   /**

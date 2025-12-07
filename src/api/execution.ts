@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import client from './_client';
 import { API_ENDPOINTS } from '../constants/api';
 import type { CodeSubmitRequest, CodeSubmitResponse } from '../types/project';
-import type { JobMetadata } from '../types/whiteboard';
+import type { JobMetadata, JobStatusResponse } from '../types/whiteboard';
+import { JobStatus } from '../types/whiteboard';
 
 /**
  * Query Keys
@@ -11,7 +12,7 @@ export const executionKeys = {
   all: ['executions'] as const,
   jobs: (projectId: string) => ['executions', projectId, 'jobs'] as const,
   detail: (projectId: string, jobId: string) => ['executions', projectId, jobId] as const,
-  status: (projectId: string, jobId: string) => ['executions', projectId, jobId, 'status'] as const,
+  status: (jobId: string) => ['executions', 'status', jobId] as const,
 };
 
 /**
@@ -73,93 +74,64 @@ export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmit
 
 /**
  * 실행 상태 조회 API (GET)
+ * GET /api/jobs/{jobId}/status
  */
-const fetchExecutionStatus = async (projectId: string, jobId: string) => {
-  const response = await client.get(API_ENDPOINTS.STATUS(projectId, jobId));
-  const data = response.data as any;
+const fetchExecutionStatus = async (jobId: string) => {
+  const response = await client.get(API_ENDPOINTS.STATUS(jobId));
+  const data = response.data as JobStatusResponse;
 
-  // 백엔드 status 값을 프론트에서 쓰는 값으로 매핑
-  const rawStatus: string = data.status ?? data.state ?? data.phase ?? 'QUEUED';
-  const normalized = rawStatus.toUpperCase();
+  // JobStatus enum을 UI 상태로 매핑
+  const statusMap: Record<JobStatus, 'Uploading' | 'Queued' | 'Running' | 'Success' | 'Failed'> = {
+    [JobStatus.PENDING]: 'Queued',
+    [JobStatus.RUNNING]: 'Running',
+    [JobStatus.SUCCESS]: 'Success',
+    [JobStatus.FAILED]: 'Failed',
+    [JobStatus.TIMEOUT]: 'Failed',
+    [JobStatus.CANCELLED]: 'Failed',
+  };
 
-  let status: 'Uploading' | 'Queued' | 'Running' | 'Success' | 'Failed';
-  switch (normalized) {
-    case 'UPLOADING':
-      status = 'Uploading';
+  const status = statusMap[data.status] || 'Queued';
+
+  // 상태 기준으로 진행률 계산
+  let progress: number;
+  switch (status) {
+    case 'Uploading':
+      progress = 10;
       break;
-    case 'QUEUED':
-    case 'PENDING':
-      status = 'Queued';
+    case 'Queued':
+      progress = 25;
       break;
-    case 'RUNNING':
-    case 'IN_PROGRESS':
-      status = 'Running';
+    case 'Running':
+      progress = 70;
       break;
-    case 'SUCCESS':
-    case 'COMPLETED':
-      status = 'Success';
-      break;
-    case 'FAILED':
-    case 'ERROR':
-      status = 'Failed';
+    case 'Success':
+    case 'Failed':
+      progress = 100;
       break;
     default:
-      status = 'Queued';
-  }
-
-  // progress 없으면 상태 기준으로 대략적인 값 계산
-  let progress: number;
-  if (typeof data.progress === 'number') {
-    progress = data.progress;
-  } else {
-    switch (status) {
-      case 'Uploading':
-        progress = 10;
-        break;
-      case 'Queued':
-        progress = 25;
-        break;
-      case 'Running':
-        progress = 70;
-        break;
-      case 'Success':
-      case 'Failed':
-        progress = 100;
-        break;
-      default:
-        progress = 0;
-    }
+      progress = 0;
   }
 
   return {
-    projectId,
-    jobId,
+    jobId: data.job_id,
+    projectId: data.project,
     status,
-    progress: Math.min(progress, 100),
-    createdAt: data.created_at || data.createdAt || new Date().toISOString(),
-    completedAt: data.completed_at || data.completedAt,
-    result: data.result || {
-      output: data.output,
-      executionTime: data.execution_time ?? data.executionTime,
-      memoryUsage: data.memory_usage ?? data.memoryUsage,
-      cpuUsage: data.cpu_usage ?? data.cpuUsage,
-    },
+    progress,
+    createdAt: data.created_at,
+    startedAt: data.started_at,
+    completedAt: data.completed_at,
+    timeoutMs: data.timeout_ms,
   };
 };
 
 /**
  * 실행 상태 조회 React Query Hook (GET)
  */
-export const useExecutionStatus = (
-  projectId: string | null,
-  jobId: string | null,
-  enabled = true,
-  refetchInterval = 3000
-) => {
+export const useExecutionStatus = (jobId: string | null, enabled = true, refetchInterval = 3000) => {
   return useQuery({
-    queryKey: executionKeys.status(projectId || '', jobId || ''),
-    queryFn: () => fetchExecutionStatus(projectId!, jobId!),
-    enabled: enabled && !!projectId && !!jobId,
+    queryKey: executionKeys.status(jobId || ''),
+    queryFn: () => fetchExecutionStatus(jobId!),
+    enabled: enabled && !!jobId,
     refetchInterval: (query) => {
       const data = query.state.data as any;
       // Success 또는 Failed 상태면 폴링 중지
@@ -176,14 +148,9 @@ export const useExecutionStatus = (
 /**
  * Query Invalidation 헬퍼 함수
  */
-export const invalidateExecutionQueries = (
-  queryClient: ReturnType<typeof useQueryClient>,
-  projectId?: string | null,
-  jobId?: string | null
-) => {
-  if (projectId && jobId) {
-    queryClient.invalidateQueries({ queryKey: executionKeys.status(projectId, jobId) });
-    queryClient.invalidateQueries({ queryKey: executionKeys.detail(projectId, jobId) });
+export const invalidateExecutionQueries = (queryClient: ReturnType<typeof useQueryClient>, jobId?: string | null) => {
+  if (jobId) {
+    queryClient.invalidateQueries({ queryKey: executionKeys.status(jobId) });
   } else {
     queryClient.invalidateQueries({ queryKey: executionKeys.all });
   }

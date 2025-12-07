@@ -15,6 +15,20 @@ export type JobMetadata = {
   status: JobStatus;
 };
 
+/**
+ * Job 상태 조회 API 응답
+ * GET /api/jobs/{jobId}/status
+ */
+export type JobStatusResponse = {
+  job_id: string;
+  status: JobStatus;
+  project: string;
+  created_at: string;
+  started_at?: string;
+  completed_at?: string;
+  timeout_ms: number;
+};
+
 export type SystemMetrics = {
   activeJobsCount: number;
   cpuUsagePercent: number;

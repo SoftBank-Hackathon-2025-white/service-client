@@ -19,7 +19,7 @@ export function TracePage() {
   const navigate = useNavigate();
 
   // 실행 상태 조회 (1초마다 폴링)
-  const { data: executionInfo, isLoading } = useExecutionStatus(projectId || null, jobId || null, true, 1000);
+  const { data: executionInfo, isLoading } = useExecutionStatus(jobId || null, true, 1000);
 
   const handleBackToProject = () => {
     if (projectId) {
@@ -196,13 +196,35 @@ export function TracePage() {
                   <InfoValue>{jobId}</InfoValue>
                 </InfoItem>
                 <InfoItem>
+                  <InfoLabel>프로젝트</InfoLabel>
+                  <InfoValue>{executionInfo?.projectId || projectId}</InfoValue>
+                </InfoItem>
+                <InfoItem>
                   <InfoLabel>상태</InfoLabel>
                   <StatusBadge>성공</StatusBadge>
                 </InfoItem>
+                {executionInfo?.createdAt && (
+                  <InfoItem>
+                    <InfoLabel>생성 시간</InfoLabel>
+                    <InfoText>{new Date(executionInfo.createdAt).toLocaleString('ko-KR')}</InfoText>
+                  </InfoItem>
+                )}
+                {executionInfo?.startedAt && (
+                  <InfoItem>
+                    <InfoLabel>시작 시간</InfoLabel>
+                    <InfoText>{new Date(executionInfo.startedAt).toLocaleString('ko-KR')}</InfoText>
+                  </InfoItem>
+                )}
                 {executionInfo?.completedAt && (
                   <InfoItem>
                     <InfoLabel>완료 시간</InfoLabel>
                     <InfoText>{new Date(executionInfo.completedAt).toLocaleString('ko-KR')}</InfoText>
+                  </InfoItem>
+                )}
+                {executionInfo?.timeoutMs && (
+                  <InfoItem>
+                    <InfoLabel>타임아웃</InfoLabel>
+                    <InfoText>{(executionInfo.timeoutMs / 1000).toFixed(0)}초</InfoText>
                   </InfoItem>
                 )}
               </InfoList>
