@@ -11,27 +11,25 @@ const SystemMetricsCard: React.FC<SystemMetricsCardProps> = ({ metrics }) => {
   return (
     <Card>
       <CardHeader>
-        <Title>시스템 현황</Title>
-        <LastUpdated>
-          마지막 업데이트: {new Date(metrics.lastUpdated).toLocaleTimeString()}
-        </LastUpdated>
+        <Title>システム状況</Title>
+        <LastUpdated>最終更新: {new Date(metrics.lastUpdated).toLocaleTimeString('ja-JP')}</LastUpdated>
       </CardHeader>
 
       <MetricsGrid>
         <MetricItem>
-          <MetricLabel>활성 Job</MetricLabel>
+          <MetricLabel>アクティブJob</MetricLabel>
           <MetricValue $highlight>{metrics.activeJobsCount}</MetricValue>
-          <MetricUnit>개</MetricUnit>
+          <MetricUnit>件</MetricUnit>
         </MetricItem>
 
         <MetricItem>
-          <MetricLabel>오늘 총 실행</MetricLabel>
+          <MetricLabel>本日の総実行</MetricLabel>
           <MetricValue>{metrics.totalJobsToday}</MetricValue>
-          <MetricUnit>개</MetricUnit>
+          <MetricUnit>件</MetricUnit>
         </MetricItem>
 
         <MetricItem>
-          <MetricLabel>성공률</MetricLabel>
+          <MetricLabel>成功率</MetricLabel>
           <MetricValue $success>{metrics.successRate.toFixed(1)}</MetricValue>
           <MetricUnit>%</MetricUnit>
         </MetricItem>
@@ -40,12 +38,12 @@ const SystemMetricsCard: React.FC<SystemMetricsCardProps> = ({ metrics }) => {
       <ProgressSection>
         <ProgressBar
           percentage={metrics.cpuUsagePercent}
-          label="CPU 사용률"
+          label="CPU使用率"
           color={`linear-gradient(90deg, #3B82F6, #1D4ED8)`}
         />
         <ProgressBar
           percentage={metrics.memoryUsagePercent}
-          label="메모리 사용률"
+          label="メモリ使用率"
           color={`linear-gradient(90deg, #8B5CF6, #6D28D9)`}
         />
       </ProgressSection>

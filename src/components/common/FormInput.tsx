@@ -10,7 +10,7 @@ interface FormInputProps {
 }
 
 /**
- * 폼 입력 필드 컴포넌트
+ * フォーム入力フィールドコンポーネント
  */
 export function FormInput({ label, value, onChange, placeholder, disabled, required }: FormInputProps) {
   return (

@@ -4,7 +4,7 @@ import { ColorKeyType } from './theme';
 declare module 'styled-components' {
   export interface DefaultTheme {
     color: { [key in ColorKeyType]: string } & {
-      // 주요 컬러셋 실제 키 (추가 필요시 theme.ts에서 참조)
+      // 主要カラーセット実際のキー（追加が必要な場合はtheme.tsを参照）
       primary?: string;
       primaryLight?: string;
       primaryDark?: string;

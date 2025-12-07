@@ -62,7 +62,7 @@ const LanguageStatsChart: React.FC<LanguageStatsChartProps> = ({ data }) => {
     },
     series: [
       {
-        name: '실행 횟수',
+        name: '実行回数',
         type: 'bar',
         barWidth: '60%',
         itemStyle: {
@@ -108,7 +108,7 @@ const LanguageStatsChart: React.FC<LanguageStatsChartProps> = ({ data }) => {
 
   return (
     <ChartContainer>
-      <ChartTitle>언어별 사용 통계</ChartTitle>
+      <ChartTitle>言語別使用統計</ChartTitle>
       <ReactECharts option={option} style={{ height: '300px' }} />
     </ChartContainer>
   );

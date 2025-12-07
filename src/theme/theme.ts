@@ -1,34 +1,34 @@
 const color = {
-  // Base colors - 바다 테마 (깊은 네이비 ~ 밝은 아쿠아)
-  baseColor1: '#0A192F', // 깊은 바다 (Dark Navy)
-  baseColor2: '#112240', // 심해 (Deep Ocean)
-  baseColor3: '#1A365D', // 바다 (Ocean Blue)
-  baseColor4: '#2C5282', // 바다 중간 (Mid Ocean)
-  baseColor5: '#4299E1', // 밝은 바다 (Light Ocean)
-  baseColor6: '#63B3ED', // 아쿠아 (Aqua)
-  baseColor7: '#90CDF4', // 밝은 아쿠아 (Light Aqua)
-  baseColor8: '#BEE3F8', // 매우 밝은 아쿠아 (Very Light Aqua)
-  baseColor9: '#EBF8FF', // 물거품 (Foam)
+  // Base colors - 海テーマ（深いネイビー～明るいアクア）
+  baseColor1: '#0A192F', // 深い海 (Dark Navy)
+  baseColor2: '#112240', // 深海 (Deep Ocean)
+  baseColor3: '#1A365D', // 海 (Ocean Blue)
+  baseColor4: '#2C5282', // 海の中間 (Mid Ocean)
+  baseColor5: '#4299E1', // 明るい海 (Light Ocean)
+  baseColor6: '#63B3ED', // アクア (Aqua)
+  baseColor7: '#90CDF4', // 明るいアクア (Light Aqua)
+  baseColor8: '#BEE3F8', // 非常に明るいアクア (Very Light Aqua)
+  baseColor9: '#EBF8FF', // 水泡 (Foam)
   white: '#FFFFFF',
 
-  // Green colors - 청록색 테마 (Teal/Turquoise)
-  greenDeep: '#0D9488', // 깊은 청록색
-  green1: '#14B8A6', // 청록색
-  green2: '#5EEAD4', // 밝은 청록색
-  greenLight: '#CCFBF1', // 매우 밝은 청록색
+  // Green colors - ターコイズテーマ (Teal/Turquoise)
+  greenDeep: '#0D9488', // 深いターコイズ
+  green1: '#14B8A6', // ターコイズ
+  green2: '#5EEAD4', // 明るいターコイズ
+  greenLight: '#CCFBF1', // 非常に明るいターコイズ
 
   // Status colors
-  statusRunning: '#06B6D4', // 실행 중 (Cyan)
-  statusSuccess: '#10B981', // 성공 (Emerald)
-  statusFailed: '#EF4444', // 실패 (Red)
-  statusQueued: '#F59E0B', // 대기 (Amber)
-  statusUploading: '#8B5CF6', // 업로드 중 (Purple)
+  statusRunning: '#06B6D4', // 実行中 (Cyan)
+  statusSuccess: '#10B981', // 成功 (Emerald)
+  statusFailed: '#EF4444', // 失敗 (Red)
+  statusQueued: '#F59E0B', // 待機 (Amber)
+  statusUploading: '#8B5CF6', // アップロード中 (Purple)
 
-  // Card colors - 투명한 바다 느낌
-  cardBackground: 'rgba(6, 182, 212, 0.08)', // 청록색 반투명
-  cardBorder: 'rgba(6, 182, 212, 0.2)', // 청록색 테두리
+  // Card colors - 透明な海の雰囲気
+  cardBackground: 'rgba(6, 182, 212, 0.08)', // ターコイズ半透明
+  cardBorder: 'rgba(6, 182, 212, 0.2)', // ターコイズボーダー
 
-  // Primary colors - 바다 블루
+  // Primary colors - 海ブルー
   primary: '#0EA5E9', // Sky Blue
   primaryLight: '#7DD3FC', // Light Sky Blue
   primaryDark: '#0284C7', // Dark Sky Blue
@@ -37,19 +37,19 @@ const color = {
   success: '#10B981', // Emerald
   successLight: '#D1FAE5', // Light Emerald
 
-  // Border colors - 바다 테마
+  // Border colors - 海テーマ
   border1: '#BEE3F8', // Light Aqua
   border2: '#90CDF4', // Aqua
   border3: '#63B3ED', // Medium Aqua
 
-  // Background colors - 깨끗한 바다 느낌
-  oceanBg1: '#F0FDFF', // 매우 밝은 바다
-  oceanBg2: '#CFFAFE', // 밝은 바다 배경
-  oceanBg3: '#A5F3FC', // 청록 배경
+  // Background colors - クリーンな海の雰囲気
+  oceanBg1: '#F0FDFF', // 非常に明るい海
+  oceanBg2: '#CFFAFE', // 明るい海の背景
+  oceanBg3: '#A5F3FC', // ターコイズ背景
 
-  // Shadow - 바다 그림자
-  shadow1: 'rgba(6, 182, 212, 0.3)', // 청록색 그림자
-  shadow2: 'rgba(14, 165, 233, 0.4)', // 파란 그림자
+  // Shadow - 海の影
+  shadow1: 'rgba(6, 182, 212, 0.3)', // ターコイズの影
+  shadow2: 'rgba(14, 165, 233, 0.4)', // 青い影
 };
 
 const spacing = {

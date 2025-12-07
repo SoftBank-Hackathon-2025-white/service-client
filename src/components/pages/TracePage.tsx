@@ -10,15 +10,15 @@ import { RunningStep } from '../pipeline/RunningStep';
 import { CompletedStep } from '../pipeline/CompletedStep';
 
 /**
- * 실행 추적 + 완료 페이지 통합
- * 코드 실행의 각 단계를 실시간으로 추적하고,
- * 성공 시에는 하단에 완료 정보도 함께 표시
+ * 実行トレース + 完了ページ統合
+ * コード実行の各段階をリアルタイムで追跡し、
+ * 成功時には下部に完了情報も一緒に表示
  */
 export function TracePage() {
   const { projectId, jobId } = useParams();
   const navigate = useNavigate();
 
-  // 실행 상태 조회 (1초마다 폴링)
+  // 実行状態照会（1秒ごとにポーリング）
   const { data: executionInfo, isLoading } = useExecutionStatus(jobId || null, true, 1000);
 
   const handleBackToProject = () => {
@@ -42,7 +42,7 @@ export function TracePage() {
       <Container>
         <LoadingWrapper>
           <Spinner />
-          <LoadingText>실행 정보를 불러오는 중...</LoadingText>
+          <LoadingText>実行情報を読み込み中...</LoadingText>
         </LoadingWrapper>
       </Container>
     );
@@ -67,15 +67,15 @@ export function TracePage() {
   const getStatusMessage = () => {
     switch (status) {
       case 'Uploading':
-        return 'S3에 코드를 업로드하는 중입니다...';
+        return 'S3にコードをアップロード中です...';
       case 'Queued':
-        return '실행 대기열에서 대기하고 있습니다...';
+        return '実行キューで待機しています...';
       case 'Running':
-        return 'ECS 컨테이너에서 코드를 실행하고 있습니다...';
+        return 'ECSコンテナでコードを実行しています...';
       case 'Success':
-        return '코드 실행이 완료되었습니다!';
+        return 'コード実行が完了しました！';
       case 'Failed':
-        return '코드 실행에 실패했습니다.';
+        return 'コード実行に失敗しました。';
       default:
         return '';
     }
@@ -87,11 +87,11 @@ export function TracePage() {
   return (
     <Container>
       <ContentWrapper>
-        {/* 헤더 영역: 뒤로가기 + Job ID */}
+        {/* ヘッダー領域: 戻る + Job ID */}
         <HeaderRow>
           <BackLink onClick={handleBackToProject}>
             <ArrowLeft size={20} />
-            프로젝트로 돌아가기
+            プロジェクトに戻る
           </BackLink>
 
           <JobIdHeader
@@ -107,13 +107,13 @@ export function TracePage() {
           </JobIdHeader>
         </HeaderRow>
 
-        {/* 실패가 아닐 때: 파이프라인/진행률 표시 */}
+        {/* 失敗でない時: パイプライン/進捗率表示 */}
         {!isFailed && (
           <PipelineWrapper>
-            {/* 진행률 */}
+            {/* 進捗率 */}
             <ProgressCard>
               <ProgressHeader>
-                <ProgressLabel>전체 진행률</ProgressLabel>
+                <ProgressLabel>全体進捗率</ProgressLabel>
                 <ProgressValue>{Math.round(progress)}%</ProgressValue>
               </ProgressHeader>
               <ProgressBarWrapper>
@@ -125,13 +125,13 @@ export function TracePage() {
               </ProgressBarWrapper>
             </ProgressCard>
 
-            {/* 상태 메시지 */}
+            {/* ステータスメッセージ */}
             <StatusMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <StatusDotSmall />
               {getStatusMessage()}
             </StatusMessage>
 
-            {/* 파이프라인 단계들 */}
+            {/* パイプラインステップ */}
             <StepsWrapper>
               <UploadingStep status={getStepStatus('Uploading')} />
               <QueuedStep status={getStepStatus('Queued')} />
@@ -141,24 +141,24 @@ export function TracePage() {
           </PipelineWrapper>
         )}
 
-        {/* 실행 실패 */}
+        {/* 実行失敗 */}
         {isFailed && (
           <ErrorCard initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
             <ErrorContent>
               <AlertCircle size={48} color="#ef4444" />
               <ErrorInfo>
-                <ErrorTitle>실행 실패</ErrorTitle>
-                <ErrorDescription>코드 실행 중 오류가 발생했습니다.</ErrorDescription>
+                <ErrorTitle>実行失敗</ErrorTitle>
+                <ErrorDescription>コード実行中にエラーが発生しました。</ErrorDescription>
               </ErrorInfo>
             </ErrorContent>
 
             <ErrorActions>
-              <BackButton onClick={handleBackToProject}>프로젝트로 돌아가기</BackButton>
+              <BackButton onClick={handleBackToProject}>プロジェクトに戻る</BackButton>
             </ErrorActions>
           </ErrorCard>
         )}
 
-        {/* 성공 시: CompletePage 내용 아래에 표시 */}
+        {/* 成功時: 完了ページの内容を下に表示 */}
         {isSuccess && (
           <SuccessSection initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <SuccessHeader
@@ -180,15 +180,15 @@ export function TracePage() {
                 <CheckCircle2 size={56} color="white" />
               </SuccessIcon>
 
-              <SuccessTitle>실행 완료!</SuccessTitle>
-              <SuccessSubtitle>코드가 성공적으로 실행되었습니다</SuccessSubtitle>
+              <SuccessTitle>実行完了！</SuccessTitle>
+              <SuccessSubtitle>コードが正常に実行されました</SuccessSubtitle>
             </SuccessHeader>
 
-            {/* Job 정보 카드 */}
+            {/* Job情報カード */}
             <InfoCard initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
               <InfoCardHeader>
                 <SuccessStatusDot />
-                <InfoCardTitle>Job 정보</InfoCardTitle>
+                <InfoCardTitle>Job情報</InfoCardTitle>
               </InfoCardHeader>
               <InfoList>
                 <InfoItem>
@@ -196,57 +196,57 @@ export function TracePage() {
                   <InfoValue>{jobId}</InfoValue>
                 </InfoItem>
                 <InfoItem>
-                  <InfoLabel>프로젝트</InfoLabel>
+                  <InfoLabel>プロジェクト</InfoLabel>
                   <InfoValue>{executionInfo?.projectId || projectId}</InfoValue>
                 </InfoItem>
                 <InfoItem>
-                  <InfoLabel>상태</InfoLabel>
-                  <StatusBadge>성공</StatusBadge>
+                  <InfoLabel>ステータス</InfoLabel>
+                  <StatusBadge>成功</StatusBadge>
                 </InfoItem>
                 {executionInfo?.createdAt && (
                   <InfoItem>
-                    <InfoLabel>생성 시간</InfoLabel>
-                    <InfoText>{new Date(executionInfo.createdAt).toLocaleString('ko-KR')}</InfoText>
+                    <InfoLabel>作成時間</InfoLabel>
+                    <InfoText>{new Date(executionInfo.createdAt).toLocaleString('ja-JP')}</InfoText>
                   </InfoItem>
                 )}
                 {executionInfo?.startedAt && (
                   <InfoItem>
-                    <InfoLabel>시작 시간</InfoLabel>
-                    <InfoText>{new Date(executionInfo.startedAt).toLocaleString('ko-KR')}</InfoText>
+                    <InfoLabel>開始時間</InfoLabel>
+                    <InfoText>{new Date(executionInfo.startedAt).toLocaleString('ja-JP')}</InfoText>
                   </InfoItem>
                 )}
                 {executionInfo?.completedAt && (
                   <InfoItem>
-                    <InfoLabel>완료 시간</InfoLabel>
-                    <InfoText>{new Date(executionInfo.completedAt).toLocaleString('ko-KR')}</InfoText>
+                    <InfoLabel>完了時間</InfoLabel>
+                    <InfoText>{new Date(executionInfo.completedAt).toLocaleString('ja-JP')}</InfoText>
                   </InfoItem>
                 )}
                 {executionInfo?.timeoutMs && (
                   <InfoItem>
-                    <InfoLabel>타임아웃</InfoLabel>
-                    <InfoText>{(executionInfo.timeoutMs / 1000).toFixed(0)}초</InfoText>
+                    <InfoLabel>タイムアウト</InfoLabel>
+                    <InfoText>{(executionInfo.timeoutMs / 1000).toFixed(0)}秒</InfoText>
                   </InfoItem>
                 )}
               </InfoList>
             </InfoCard>
 
-            {/* 액션 버튼 */}
+            {/* アクションボタン */}
             <ActionButtons initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-              <ActionButton onClick={handleGoToHistory}>실행 이력 보기</ActionButton>
+              <ActionButton onClick={handleGoToHistory}>実行履歴を見る</ActionButton>
             </ActionButtons>
 
-            {/* 푸터 메시지 */}
+            {/* フッターメッセージ */}
             <FooterMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-              🌊 Lambda the Sea - 깨끗하고 투명한 서버리스 실행 완료
+              🌊 Lambda the Sea - クリーンで透明なServerless実行完了
             </FooterMessage>
           </SuccessSection>
         )}
 
-        {/* 투명성 메시지 (실패 제외 전체) */}
+        {/* 透明性メッセージ（失敗を除く全体） */}
         {!isFailed && (
           <InfoMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            ❄️ <strong>Pure & Transparent:</strong>
-            모든 실행 과정이 투명하게 공개됩니다.
+            🌊 <strong>Pure & Transparent:</strong>
+            すべての実行プロセスが透明に公開されます。
           </InfoMessage>
         )}
       </ContentWrapper>
@@ -254,7 +254,7 @@ export function TracePage() {
   );
 }
 
-/* ---------------- 공통 스타일 ---------------- */
+/* ---------------- 共通スタイル ---------------- */
 
 const Container = styled.div`
   min-height: 100vh;
@@ -514,7 +514,7 @@ const InfoMessage = styled(motion.div)`
   }
 `;
 
-/* ---------------- 성공 섹션 스타일 ---------------- */
+/* ---------------- 成功セクションスタイル ---------------- */
 
 const SuccessSection = styled(motion.div)`
   margin-top: ${(props) => props.theme.spacing.xl};

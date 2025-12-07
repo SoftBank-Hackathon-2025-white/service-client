@@ -53,7 +53,7 @@ const JobStatusChart: React.FC<JobStatusChartProps> = ({ data }) => {
     },
     series: [
       {
-        name: 'Job 상태',
+        name: 'Jobステータス',
         type: 'pie',
         radius: ['40%', '70%'],
         center: ['35%', '50%'],
@@ -95,7 +95,7 @@ const JobStatusChart: React.FC<JobStatusChartProps> = ({ data }) => {
 
   return (
     <ChartContainer>
-      <ChartTitle>Job 상태 분포</ChartTitle>
+      <ChartTitle>Jobステータス分布</ChartTitle>
       <ReactECharts option={option} style={{ height: '300px' }} />
     </ChartContainer>
   );

@@ -8,8 +8,8 @@ interface LanguageSelectorProps {
 }
 
 /**
- * 프로그래밍 언어 선택 컴포넌트
- * Python, JavaScript, Java 중 선택
+ * プログラミング言語選択コンポーネント
+ * Python, JavaScript, Javaから選択
  */
 export function LanguageSelector({ value, onChange, disabled = false }: LanguageSelectorProps) {
   const languages = [
@@ -22,7 +22,7 @@ export function LanguageSelector({ value, onChange, disabled = false }: Language
     <Container>
       <Label>
         <Code size={20} color="#0ea5e9" />
-        <span>프로그래밍 언어 선택</span>
+        <span>プログラミング言語選択</span>
       </Label>
 
       <LanguageGrid>
@@ -41,7 +41,7 @@ export function LanguageSelector({ value, onChange, disabled = false }: Language
       </LanguageGrid>
 
       <SelectedInfo>
-        ✓ 선택된 언어: <strong>{languages.find((l) => l.value === value)?.label}</strong>
+        ✓ 選択された言語: <strong>{languages.find((l) => l.value === value)?.label}</strong>
       </SelectedInfo>
     </Container>
   );

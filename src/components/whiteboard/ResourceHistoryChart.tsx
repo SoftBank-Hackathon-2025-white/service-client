@@ -26,7 +26,7 @@ const ResourceHistoryChart: React.FC<ResourceHistoryChartProps> = ({ data, clust
       },
     },
     legend: {
-      data: ['CPU 사용률', '메모리 사용률'],
+      data: ['CPU使用率', 'メモリ使用率'],
       textStyle: {
         color: '#B2B7C4',
       },
@@ -80,7 +80,7 @@ const ResourceHistoryChart: React.FC<ResourceHistoryChartProps> = ({ data, clust
     },
     series: [
       {
-        name: 'CPU 사용률',
+        name: 'CPU使用率',
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -118,7 +118,7 @@ const ResourceHistoryChart: React.FC<ResourceHistoryChartProps> = ({ data, clust
         data: data.map((point) => point.cpu_utilization.toFixed(1)),
       },
       {
-        name: '메모리 사용률',
+        name: 'メモリ使用率',
         type: 'line',
         smooth: true,
         symbol: 'circle',
@@ -161,7 +161,7 @@ const ResourceHistoryChart: React.FC<ResourceHistoryChartProps> = ({ data, clust
   return (
     <ChartContainer>
       <ChartHeader>
-        <ChartTitle>CloudWatch 메트릭</ChartTitle>
+        <ChartTitle>CloudWatchメトリクス</ChartTitle>
         {clusterName && <ClusterBadge>{clusterName}</ClusterBadge>}
       </ChartHeader>
       <ReactECharts option={option} style={{ height: '300px' }} />

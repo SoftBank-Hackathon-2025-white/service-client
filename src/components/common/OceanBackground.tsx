@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
 /**
- * 바다 배경 애니메이션 컴포넌트
- * 바다 속에서 떠오르는 기포(물방울) 효과를 제공
- * Lambda the Sea 테마 - 투명하고 깨끗한 바다 속 느낌
+ * 海の背景アニメーションコンポーネント
+ * 海の中から浮かび上がる気泡（泡）エフェクトを提供
+ * Lambda the Seaテーマ - 透明でクリーンな海の中の雰囲気
  */
 export const OceanBackground: React.FC = () => {
   interface Bubble {
@@ -20,13 +20,13 @@ export const OceanBackground: React.FC = () => {
   useEffect(() => {
     const bubbleArray: Bubble[] = [];
 
-    // 60개의 랜덤 기포 생성
+    // 60個のランダム気泡生成
     for (let i = 0; i < 60; i++) {
       bubbleArray.push({
         id: i,
         x: Math.random() * 100,
         size: Math.random() * 12 + 4, // 4px ~ 16px
-        duration: Math.random() * 10 + 12, // 12초 ~ 22초 (천천히 떠오름)
+        duration: Math.random() * 10 + 12, // 12秒 ~ 22秒 (ゆっくり浮上)
         delay: Math.random() * 10,
       });
     }
@@ -46,8 +46,8 @@ export const OceanBackground: React.FC = () => {
             bottom: -20,
           }}
           animate={{
-            y: ['0vh', '-120vh'], // 아래에서 위로 떠오름
-            x: [0, Math.sin(bubble.id) * 60, Math.cos(bubble.id) * 40, 0], // 물결치듯 좌우 움직임
+            y: ['0vh', '-120vh'], // 下から上へ浮上
+            x: [0, Math.sin(bubble.id) * 60, Math.cos(bubble.id) * 40, 0], // 波のように左右に動く
             opacity: [0, 0.6, 0.8, 0.6, 0],
             scale: [0.8, 1, 1.1, 1, 0.8],
           }}
@@ -59,7 +59,7 @@ export const OceanBackground: React.FC = () => {
           }}
         />
       ))}
-      {/* 큰 기포 몇 개 추가 (더욱 생동감) */}
+      {/* 大きな気泡をいくつか追加（さらに生き生きと） */}
       {[1, 2, 3, 4, 5].map((i) => (
         <LargeBubble
           key={`large-${i}`}

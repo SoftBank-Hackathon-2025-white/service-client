@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import { FileCode, Sparkles } from 'lucide-react';
 
 const guideAnnotation = {
-  python: '# Python 코드를 입력하세요',
-  node: '// JavaScript 코드를 입력하세요',
-  java: '// Java 코드를 입력하세요',
+  python: '# Pythonコードを入力してください',
+  node: '// JavaScriptコードを入力してください',
+  java: '// Javaコードを入力してください',
 };
 
 const exampleCode: Record<string, string> = {
@@ -29,12 +29,12 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
       <Header>
         <Label>
           <FileCode size={20} color="#0ea5e9" />
-          <span>코드 입력</span>
+          <span>コード入力</span>
         </Label>
 
         <ExampleButton type="button" onClick={handleLoadExample} disabled={disabled}>
           <Sparkles size={16} />
-          <span>예시 코드</span>
+          <span>サンプルコード</span>
         </ExampleButton>
       </Header>
 
@@ -43,15 +43,15 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          placeholder={`${guideAnnotation[language]}\n\n예:\n${exampleCode[language]}`}
+          placeholder={`${guideAnnotation[language]}\n\n例:\n${exampleCode[language]}`}
         />
 
         <LineCount>{value.split('\n').length} lines</LineCount>
       </EditorWrapper>
 
       <TipMessage>
-        💡 <strong>Tip:</strong> Tab 키로 들여쓰기를 할 수 있습니다. 코드를 입력한 후 하단의 "Lambda 실행" 버튼을
-        클릭하세요.
+        💡 <strong>Tip:</strong> Tabキーでインデントできます。コードを入力した後、下の「Lambda実行」ボタンを
+        クリックしてください。
       </TipMessage>
     </Container>
   );

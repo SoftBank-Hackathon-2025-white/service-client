@@ -16,10 +16,10 @@ import { FormInput } from '../common/FormInput';
 type TabType = 'upload' | 'history' | 'monitoring';
 
 /**
- * 프로젝트 상세 페이지
- * - 탭1: 코드 업로드
- * - 탭2: 최근 실행 이력
- * - 탭3: 시스템 모니터링
+ * プロジェクト詳細ページ
+ * - タブ1: コードアップロード
+ * - タブ2: 最近の実行履歴
+ * - タブ3: システムモニタリング
  */
 export function ProjectDetailPage() {
   const { projectId } = useParams();
@@ -27,7 +27,7 @@ export function ProjectDetailPage() {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('upload');
 
-  // URL query parameter로 탭 설정
+  // URLクエリパラメータでタブ設定
   useEffect(() => {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'history' || tabParam === 'monitoring' || tabParam === 'upload') {
@@ -35,7 +35,7 @@ export function ProjectDetailPage() {
     }
   }, [searchParams]);
 
-  // 코드 업로드 상태
+  // コードアップロード状態
   const [language, setLanguage] = useState<'python' | 'node' | 'java'>('python');
   const [code, setCode] = useState('');
   const [functionName, setFunctionName] = useState('');
@@ -46,7 +46,7 @@ export function ProjectDetailPage() {
   const { data: jobsData, isLoading: isJobsLoading } = useProjectJobs(projectId, activeTab === 'history');
   const { data: cloudWatchData, isLoading: isCloudWatchLoading } = useCloudWatchMetrics(activeTab === 'monitoring');
 
-  // 프로젝트 목록에서 현재 프로젝트 찾기
+  // プロジェクトリストから現在のプロジェクトを検索
   const project = useMemo(() => {
     if (!projectsData || !projectId) {
       return null;
@@ -56,17 +56,17 @@ export function ProjectDetailPage() {
 
   const handleSubmit = async () => {
     if (!code.trim() || !projectId) {
-      alert('코드를 입력해주세요.');
+      alert('コードを入力してください。');
       return;
     }
 
     if (!functionName.trim()) {
-      alert('함수 이름을 입력해주세요.');
+      alert('関数名を入力してください。');
       return;
     }
 
     if (!description.trim()) {
-      alert('설명을 입력해주세요.');
+      alert('説明を入力してください。');
       return;
     }
 
@@ -83,7 +83,7 @@ export function ProjectDetailPage() {
       navigate(getJobExecutionPath(projectId, jobMetadata.job_id));
     } catch (err) {
       console.error('Failed to submit code:', err);
-      alert('코드 제출에 실패했습니다. 다시 시도해주세요.');
+      alert('コードの送信に失敗しました。もう一度お試しください。');
     } finally {
       setIsSubmitting(false);
     }
@@ -100,7 +100,7 @@ export function ProjectDetailPage() {
       <Container>
         <LoadingContainer>
           <Spinner />
-          <LoadingText>프로젝트 데이터를 불러오는 중...</LoadingText>
+          <LoadingText>プロジェクトデータを読み込み中...</LoadingText>
         </LoadingContainer>
       </Container>
     );
@@ -111,11 +111,11 @@ export function ProjectDetailPage() {
       <Container>
         <ErrorContainer>
           <ErrorIcon>⚠️</ErrorIcon>
-          <ErrorTitle>프로젝트 정보를 불러올 수 없습니다</ErrorTitle>
-          <ErrorMessage>{error instanceof Error ? error.message : '서버와의 연결을 확인해주세요.'}</ErrorMessage>
+          <ErrorTitle>プロジェクト情報を読み込めません</ErrorTitle>
+          <ErrorMessage>{error instanceof Error ? error.message : 'サーバーとの接続を確認してください。'}</ErrorMessage>
           <BackButton onClick={() => navigate(PATHS.MAIN)}>
             <ArrowLeft size={16} />
-            프로젝트 목록으로
+            プロジェクト一覧へ
           </BackButton>
         </ErrorContainer>
       </Container>
@@ -128,11 +128,11 @@ export function ProjectDetailPage() {
         <Container>
           <ErrorContainer>
             <ErrorIcon>🔍</ErrorIcon>
-            <ErrorTitle>프로젝트를 찾을 수 없습니다</ErrorTitle>
-            <ErrorMessage>요청하신 프로젝트가 존재하지 않거나 삭제되었습니다.</ErrorMessage>
+            <ErrorTitle>プロジェクトが見つかりません</ErrorTitle>
+            <ErrorMessage>お探しのプロジェクトは存在しないか、削除されました。</ErrorMessage>
             <BackButton onClick={() => navigate(PATHS.MAIN)}>
               <ArrowLeft size={16} />
-              프로젝트 목록으로
+              プロジェクト一覧へ
             </BackButton>
           </ErrorContainer>
         </Container>
@@ -147,7 +147,7 @@ export function ProjectDetailPage() {
         <HeaderTop>
           <BackLink onClick={() => navigate(PATHS.MAIN)}>
             <ArrowLeft size={20} />
-            프로젝트 목록
+            プロジェクト一覧
           </BackLink>
         </HeaderTop>
         <HeaderTitle>
@@ -159,13 +159,13 @@ export function ProjectDetailPage() {
       <TabContainer>
         <TabButton $isActive={activeTab === 'upload'} onClick={() => setActiveTab('upload')}>
           <Upload size={16} />
-          코드 업로드
+          コードアップロード
         </TabButton>
         <TabButton $isActive={activeTab === 'history'} onClick={() => setActiveTab('history')}>
-          📋 실행 이력
+          📋 実行履歴
         </TabButton>
         <TabButton $isActive={activeTab === 'monitoring'} onClick={() => setActiveTab('monitoring')}>
-          📊 모니터링
+          📊 モニタリング
         </TabButton>
       </TabContainer>
 
@@ -174,13 +174,13 @@ export function ProjectDetailPage() {
           <UploadSection>
             <UploadCard>
               <UploadHeader>
-                <UploadTitle>새 코드 실행</UploadTitle>
-                <UploadDescription>코드를 작성하고 실행하면 결과를 실시간으로 확인할 수 있습니다</UploadDescription>
+                <UploadTitle>新規コード実行</UploadTitle>
+                <UploadDescription>コードを作成して実行すると、結果をリアルタイムで確認できます</UploadDescription>
               </UploadHeader>
 
               <FormSection>
                 <FormInput
-                  label="함수 이름"
+                  label="関数名"
                   value={functionName}
                   onChange={setFunctionName}
                   placeholder="my_function"
@@ -189,10 +189,10 @@ export function ProjectDetailPage() {
                 />
 
                 <FormInput
-                  label="설명"
+                  label="説明"
                   value={description}
                   onChange={setDescription}
-                  placeholder="이 함수가 수행하는 작업을 설명해주세요"
+                  placeholder="この関数が実行する作業を説明してください"
                   disabled={isSubmitting}
                   required
                 />
@@ -221,7 +221,7 @@ export function ProjectDetailPage() {
           (isJobsLoading ? (
             <LoadingContainer>
               <Spinner />
-              <LoadingText>실행 이력을 불러오는 중...</LoadingText>
+              <LoadingText>実行履歴を読み込み中...</LoadingText>
             </LoadingContainer>
           ) : (
             <JobListTable jobs={jobsData || []} onJobClick={handleJobClick} />
@@ -231,14 +231,14 @@ export function ProjectDetailPage() {
           (isCloudWatchLoading ? (
             <LoadingContainer>
               <Spinner />
-              <LoadingText>모니터링 데이터를 불러오는 중...</LoadingText>
+              <LoadingText>モニタリングデータを読み込み中...</LoadingText>
             </LoadingContainer>
           ) : cloudWatchData ? (
             <MonitoringSection>
               <MonitoringHeader>
-                <MonitoringTitle>클러스터 모니터링</MonitoringTitle>
+                <MonitoringTitle>クラスターモニタリング</MonitoringTitle>
                 <ClusterInfo>
-                  <ClusterLabel>클러스터:</ClusterLabel>
+                  <ClusterLabel>クラスター:</ClusterLabel>
                   <ClusterName>{cloudWatchData.cluster_name}</ClusterName>
                 </ClusterInfo>
               </MonitoringHeader>
@@ -246,7 +246,7 @@ export function ProjectDetailPage() {
                 <MetricCard>
                   <MetricIcon>💻</MetricIcon>
                   <MetricContent>
-                    <MetricLabel>현재 CPU 사용률</MetricLabel>
+                    <MetricLabel>現在のCPU使用率</MetricLabel>
                     <MetricValue $color="#3B82F6">
                       {cloudWatchData.metrics.length > 0
                         ? (cloudWatchData.metrics.at(-1)?.cpu_utilization ?? 0).toFixed(1)
@@ -258,7 +258,7 @@ export function ProjectDetailPage() {
                 <MetricCard>
                   <MetricIcon>🧠</MetricIcon>
                   <MetricContent>
-                    <MetricLabel>현재 메모리 사용률</MetricLabel>
+                    <MetricLabel>現在のメモリ使用率</MetricLabel>
                     <MetricValue $color="#8B5CF6">
                       {cloudWatchData.metrics.length > 0
                         ? (cloudWatchData.metrics.at(-1)?.memory_utilization ?? 0).toFixed(1)
@@ -271,7 +271,7 @@ export function ProjectDetailPage() {
               <ResourceHistoryChart data={cloudWatchData.metrics} clusterName={cloudWatchData.cluster_name} />
             </MonitoringSection>
           ) : (
-            <EmptyState>모니터링 데이터가 없습니다.</EmptyState>
+            <EmptyState>モニタリングデータがありません。</EmptyState>
           ))}
       </Content>
     </Container>

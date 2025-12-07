@@ -6,20 +6,20 @@ import { useProjects, useCreateProject } from '../../api/project';
 import { getProjectPath } from '../../constants/paths';
 
 /**
- * 프로젝트 목록 페이지
+ * プロジェクト一覧ページ
  */
 export function ProjectListPage() {
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useProjects();
   const createProjectMutation = useCreateProject();
 
-  // 모달 상태
+  // モーダル状態
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
 
   const handleCreateProject = async () => {
     if (!newProjectName.trim()) {
-      alert('프로젝트 이름을 입력해주세요.');
+      alert('プロジェクト名を入力してください。');
       return;
     }
 
@@ -32,7 +32,7 @@ export function ProjectListPage() {
       navigate(getProjectPath(project.project_id.toString()));
     } catch (err) {
       console.error('Failed to create project:', err);
-      alert('프로젝트 생성에 실패했습니다.');
+      alert('プロジェクトの作成に失敗しました。');
     }
   };
 
@@ -46,7 +46,7 @@ export function ProjectListPage() {
       <Container>
         <LoadingWrapper>
           <Spinner />
-          <LoadingText>프로젝트 목록을 불러오는 중...</LoadingText>
+          <LoadingText>プロジェクト一覧を読み込み中...</LoadingText>
         </LoadingWrapper>
       </Container>
     );
@@ -57,8 +57,8 @@ export function ProjectListPage() {
       <Container>
         <ErrorWrapper>
           <ErrorIcon>⚠️</ErrorIcon>
-          <ErrorTitle>데이터를 불러올 수 없습니다</ErrorTitle>
-          <ErrorMessage>{error instanceof Error ? error.message : '서버와의 연결을 확인해주세요.'}</ErrorMessage>
+          <ErrorTitle>データを読み込めません</ErrorTitle>
+          <ErrorMessage>{error instanceof Error ? error.message : 'サーバーとの接続を確認してください。'}</ErrorMessage>
         </ErrorWrapper>
       </Container>
     );
@@ -67,7 +67,7 @@ export function ProjectListPage() {
   return (
     <Container>
       <ContentWrapper>
-        {/* 헤더 영역 */}
+        {/* ヘッダー領域 */}
         <HeroSection>
           <HeroContent>
             <TitleWrapper>
@@ -77,33 +77,34 @@ export function ProjectListPage() {
               </IconWrapper>
               <Title>Lambda the Sea</Title>
             </TitleWrapper>
-            <Subtitle>Serverless Lambda를 깨끗한 바다 속처럼 투명하게 보여주는 플랫폼</Subtitle>
+            <Subtitle>Serverless Lambdaを透明な海のように可視化するプラットフォーム</Subtitle>
 
-            {/* 특징 배지 */}
+            {/* 特徴バッジ */}
             <FeatureBadges>
               <FeatureBadge>
-                <span>🔍</span> 완전한 투명성
+                <span>🔍</span> 完全な透明性
               </FeatureBadge>
               <FeatureBadge>
-                <span>❄️</span> 순수한 실행
+                <span>🌊</span> クリーンな実行
               </FeatureBadge>
               <FeatureBadge>
-                <span>📊</span> 리소스 측정
+                <span>📊</span> リソース測定
               </FeatureBadge>
             </FeatureBadges>
           </HeroContent>
         </HeroSection>
 
-        {/* 프로젝트 섹션 */}
+        {/* プロジェクトセクション */}
         <ProjectsSection>
           <SectionHeader>
             <SectionTitleWrapper>
               <FolderOpen size={24} />
-              <SectionTitle>프로젝트</SectionTitle>
-              <ProjectCount>{data?.length || 0}개</ProjectCount>
+              <SectionTitle>プロジェクト</SectionTitle>
+              <ProjectCount>{data?.length || 0}件</ProjectCount>
             </SectionTitleWrapper>
             <CreateButton onClick={() => setIsModalOpen(true)}>
-              <Plus size={18} />새 프로젝트
+              <Plus size={18} />
+              新規プロジェクト
             </CreateButton>
           </SectionHeader>
 
@@ -120,14 +121,15 @@ export function ProjectListPage() {
               </ProjectCard>
             ))}
 
-            {/* 빈 상태 */}
+            {/* 空の状態 */}
             {(!data || data.length === 0) && (
               <EmptyState>
                 <EmptyIcon>📁</EmptyIcon>
-                <EmptyTitle>프로젝트가 없습니다</EmptyTitle>
-                <EmptyDescription>새 프로젝트를 생성하여 코드를 실행해보세요</EmptyDescription>
+                <EmptyTitle>プロジェクトがありません</EmptyTitle>
+                <EmptyDescription>新しいプロジェクトを作成してコードを実行してみましょう</EmptyDescription>
                 <CreateButton onClick={() => setIsModalOpen(true)}>
-                  <Plus size={18} />새 프로젝트 만들기
+                  <Plus size={18} />
+                  新規プロジェクト作成
                 </CreateButton>
               </EmptyState>
             )}
@@ -135,12 +137,12 @@ export function ProjectListPage() {
         </ProjectsSection>
       </ContentWrapper>
 
-      {/* 프로젝트 생성 모달 */}
+      {/* プロジェクト作成モーダル */}
       {isModalOpen && (
         <ModalOverlay onClick={handleModalClose}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalHeader>
-              <ModalTitle>새 프로젝트 만들기</ModalTitle>
+              <ModalTitle>新規プロジェクト作成</ModalTitle>
               <CloseButton onClick={handleModalClose}>
                 <X size={20} />
               </CloseButton>
@@ -148,10 +150,10 @@ export function ProjectListPage() {
 
             <ModalBody>
               <FormGroup>
-                <Label>프로젝트 이름 *</Label>
+                <Label>プロジェクト名 *</Label>
                 <Input
                   type="text"
-                  placeholder="예: My Awesome Project"
+                  placeholder="例: My Awesome Project"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   autoFocus
@@ -160,9 +162,9 @@ export function ProjectListPage() {
             </ModalBody>
 
             <ModalFooter>
-              <CancelButton onClick={handleModalClose}>취소</CancelButton>
+              <CancelButton onClick={handleModalClose}>キャンセル</CancelButton>
               <SubmitButton onClick={handleCreateProject} disabled={createProjectMutation.isPending}>
-                {createProjectMutation.isPending ? '생성 중...' : '프로젝트 생성'}
+                {createProjectMutation.isPending ? '作成中...' : 'プロジェクト作成'}
               </SubmitButton>
             </ModalFooter>
           </ModalContent>

@@ -15,12 +15,12 @@ export function SubmitButton({ onClick, disabled = false, isSubmitting = false }
           <SpinningIcon>
             <Loader2 size={20} />
           </SpinningIcon>
-          <span>제출 중...</span>
+          <span>送信中...</span>
         </>
       ) : (
         <>
           <Play size={20} />
-          <span>Lambda 실행</span>
+          <span>Lambda実行</span>
         </>
       )}
     </Button>

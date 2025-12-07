@@ -7,7 +7,7 @@ interface QueuedStepProps {
 }
 
 /**
- * 파이프라인 - Queued 단계
+ * パイプライン - Queued段階
  */
 export function QueuedStep({ status }: QueuedStepProps) {
   const isPending = status === 'pending';
@@ -16,19 +16,11 @@ export function QueuedStep({ status }: QueuedStepProps) {
 
   return (
     <StepCard $status={status}>
-      <IconWrapper $status={status}>
-        {isCompleted ? (
-          <CheckCircle size={24} />
-        ) : (
-          <Clock size={24} />
-        )}
-      </IconWrapper>
+      <IconWrapper $status={status}>{isCompleted ? <CheckCircle size={24} /> : <Clock size={24} />}</IconWrapper>
 
       <StepContent>
         <StepTitle $status={status}>Queued</StepTitle>
-        <StepDescription $status={status}>
-          실행 대기열에서 순서를 기다리고 있습니다
-        </StepDescription>
+        <StepDescription $status={status}>実行キューで順番を待っています</StepDescription>
 
         {isActive && (
           <ProgressBar>
@@ -42,9 +34,9 @@ export function QueuedStep({ status }: QueuedStepProps) {
       </StepContent>
 
       <StatusBadge $status={status}>
-        {isCompleted && '완료'}
-        {isActive && '진행중'}
-        {isPending && '대기'}
+        {isCompleted && '完了'}
+        {isActive && '進行中'}
+        {isPending && '待機'}
       </StatusBadge>
     </StepCard>
   );
@@ -55,16 +47,19 @@ const StepCard = styled.div<{ $status: 'pending' | 'active' | 'completed' }>`
   align-items: center;
   gap: ${(props) => props.theme.spacing.md};
   background: ${(props) =>
-    props.$status === 'completed' ? props.theme.color.baseColor3 :
-    props.$status === 'active' ? props.theme.color.baseColor2 :
-    props.theme.color.cardBackground
-  };
+    props.$status === 'completed'
+      ? props.theme.color.baseColor3
+      : props.$status === 'active'
+        ? props.theme.color.baseColor2
+        : props.theme.color.cardBackground};
   backdrop-filter: blur(10px);
-  border: 2px solid ${(props) =>
-    props.$status === 'completed' ? props.theme.color.green1 :
-    props.$status === 'active' ? props.theme.color.statusQueued :
-    props.theme.color.cardBorder
-  };
+  border: 2px solid
+    ${(props) =>
+      props.$status === 'completed'
+        ? props.theme.color.green1
+        : props.$status === 'active'
+          ? props.theme.color.statusQueued
+          : props.theme.color.cardBorder};
   border-radius: ${(props) => props.theme.borderRadius.xl};
   padding: ${(props) => props.theme.spacing.lg};
   transition: all 0.3s ease;
@@ -78,10 +73,11 @@ const IconWrapper = styled.div<{ $status: 'pending' | 'active' | 'completed' }>`
   justify-content: center;
   border-radius: ${(props) => props.theme.borderRadius.lg};
   background: ${(props) =>
-    props.$status === 'completed' ? props.theme.color.green1 :
-    props.$status === 'active' ? props.theme.color.statusQueued :
-    props.theme.color.baseColor4
-  };
+    props.$status === 'completed'
+      ? props.theme.color.green1
+      : props.$status === 'active'
+        ? props.theme.color.statusQueued
+        : props.theme.color.baseColor4};
   color: white;
   flex-shrink: 0;
 `;
@@ -94,17 +90,18 @@ const StepTitle = styled.h3<{ $status: 'pending' | 'active' | 'completed' }>`
   font-size: ${(props) => props.theme.fontSize.lg};
   font-weight: 600;
   color: ${(props) =>
-    props.$status === 'completed' ? props.theme.color.green1 :
-    props.$status === 'active' ? props.theme.color.statusQueued :
-    props.theme.color.baseColor6
-  };
+    props.$status === 'completed'
+      ? props.theme.color.green1
+      : props.$status === 'active'
+        ? props.theme.color.statusQueued
+        : props.theme.color.baseColor6};
   margin-bottom: ${(props) => props.theme.spacing.xs};
 `;
 
 const StepDescription = styled.p<{ $status: 'pending' | 'active' | 'completed' }>`
   font-size: ${(props) => props.theme.fontSize.sm};
   color: ${(props) => props.theme.color.baseColor6};
-  opacity: ${(props) => props.$status === 'pending' ? 0.6 : 1};
+  opacity: ${(props) => (props.$status === 'pending' ? 0.6 : 1)};
 `;
 
 const ProgressBar = styled.div`
@@ -131,10 +128,11 @@ const StatusBadge = styled.span<{ $status: 'pending' | 'active' | 'completed' }>
   font-size: ${(props) => props.theme.fontSize.xs};
   font-weight: 600;
   background: ${(props) =>
-    props.$status === 'completed' ? props.theme.color.green1 :
-    props.$status === 'active' ? props.theme.color.statusQueued :
-    props.theme.color.baseColor4
-  };
+    props.$status === 'completed'
+      ? props.theme.color.green1
+      : props.$status === 'active'
+        ? props.theme.color.statusQueued
+        : props.theme.color.baseColor4};
   color: white;
   flex-shrink: 0;
 `;

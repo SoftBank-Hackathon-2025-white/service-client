@@ -17,10 +17,10 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs, onJobClick }) => {
   return (
     <Container>
       <Header>
-        <Title>최근 실행 이력</Title>
+        <Title>最近の実行履歴</Title>
         <FilterContainer>
           <FilterButton $active={filterStatus === 'ALL'} onClick={() => setFilterStatus('ALL')}>
-            전체
+            全体
           </FilterButton>
           {Object.values(JobStatus).map((status) => (
             <FilterButton key={status} $active={filterStatus === status} onClick={() => setFilterStatus(status)}>
@@ -35,16 +35,16 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs, onJobClick }) => {
           <thead>
             <tr>
               <Th>Job ID</Th>
-              <Th>상태</Th>
-              <Th>프로젝트</Th>
-              <Th>메시지</Th>
+              <Th>ステータス</Th>
+              <Th>プロジェクト</Th>
+              <Th>メッセージ</Th>
             </tr>
           </thead>
           <tbody>
             {filteredJobs.length === 0 ? (
               <tr>
                 <Td colSpan={4}>
-                  <EmptyMessage>실행 이력이 없습니다.</EmptyMessage>
+                  <EmptyMessage>実行履歴がありません。</EmptyMessage>
                 </Td>
               </tr>
             ) : (
