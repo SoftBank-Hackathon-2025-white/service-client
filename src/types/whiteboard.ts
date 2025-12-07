@@ -7,12 +7,40 @@ export enum JobStatus {
   CANCELLED = 'CANCELLED',
 }
 
+export type JobExecutionResult = {
+  job_id: string;
+  status: string;
+  stderr: string;
+  stdout: string;
+  log_key: string;
+  code_key: string;
+  logs_url: string;
+  resource: {
+    memory_mb: number;
+    cpu_percent: number;
+    execution_time_ms: number;
+  };
+  completed_at: string | null;
+  error_message: string | null;
+};
+
+export type JobData = {
+  created_at: string;
+  updated_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  code_key: string;
+  language: string;
+  result: JobExecutionResult | null;
+};
+
 export type JobMetadata = {
   job_id: string;
   project: string;
   code_key?: string;
   message: string;
   status: JobStatus;
+  data?: JobData;
 };
 
 /**
