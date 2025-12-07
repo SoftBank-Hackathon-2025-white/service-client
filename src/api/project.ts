@@ -8,7 +8,6 @@ import type { Project, ProjectListResponse, ProjectDetailData } from '../types/p
  */
 export type CreateProjectRequest = {
   name: string;
-  description?: string;
 };
 
 /**
@@ -43,7 +42,7 @@ export const useProjects = () => {
  * 프로젝트 생성
  */
 export const createProject = async (request: CreateProjectRequest): Promise<Project> => {
-  const response = await client.post<Project>(API_ENDPOINTS.PROJECTS, request);
+  const response = await client.post<Project>(API_ENDPOINTS.PROJECT_CREATE, request);
   return response.data;
 };
 

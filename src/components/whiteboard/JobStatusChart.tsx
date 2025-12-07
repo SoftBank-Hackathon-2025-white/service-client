@@ -11,16 +11,18 @@ interface JobStatusChartProps {
 const JobStatusChart: React.FC<JobStatusChartProps> = ({ data }) => {
   const getStatusColor = (status: JobStatus): string => {
     switch (status) {
-      case JobStatus.SUCCESS:
-        return '#10B981';
+      case JobStatus.PENDING:
+        return '#F59E0B';
       case JobStatus.RUNNING:
         return '#3B82F6';
+      case JobStatus.SUCCESS:
+        return '#10B981';
       case JobStatus.FAILED:
         return '#EF4444';
-      case JobStatus.QUEUED:
-        return '#F59E0B';
-      case JobStatus.UPLOADING:
-        return '#8B5CF6';
+      case JobStatus.TIMEOUT:
+        return '#F97316';
+      case JobStatus.CANCELLED:
+        return '#6B7280';
       default:
         return '#7F8799';
     }

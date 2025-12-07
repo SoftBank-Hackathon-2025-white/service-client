@@ -23,6 +23,11 @@ const Badge = styled.span<{ $status: JobStatus }>`
 
   ${({ $status, theme }) => {
     switch ($status) {
+      case JobStatus.PENDING:
+        return `
+          background: ${theme.color.statusQueued || theme.color.baseColor5}20;
+          color: ${theme.color.statusQueued || theme.color.baseColor5};
+        `;
       case JobStatus.RUNNING:
         return `
           background: ${theme.color.statusRunning}20;
@@ -39,15 +44,15 @@ const Badge = styled.span<{ $status: JobStatus }>`
           background: ${theme.color.statusFailed}20;
           color: ${theme.color.statusFailed};
         `;
-      case JobStatus.QUEUED:
+      case JobStatus.TIMEOUT:
         return `
-          background: ${theme.color.statusQueued}20;
-          color: ${theme.color.statusQueued};
+          background: ${theme.color.statusFailed || '#f97316'}20;
+          color: ${theme.color.statusFailed || '#f97316'};
         `;
-      case JobStatus.UPLOADING:
+      case JobStatus.CANCELLED:
         return `
-          background: ${theme.color.statusUploading}20;
-          color: ${theme.color.statusUploading};
+          background: ${theme.color.baseColor5}20;
+          color: ${theme.color.baseColor5};
         `;
       default:
         return `

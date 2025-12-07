@@ -6,11 +6,6 @@ import type { JobMetadata, SystemMetrics, ResourceHistoryPoint, JobStatusStats, 
 export type Project = {
   id: string;
   name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-  jobCount: number;
-  lastJobAt?: string;
 };
 
 /**

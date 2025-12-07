@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Snowflake, FolderOpen, Clock, Activity, Plus, X } from 'lucide-react';
+import { Snowflake, FolderOpen, Plus, X } from 'lucide-react';
 import { useProjects, useCreateProject } from '../../api/project';
 import { getProjectPath } from '../../constants/paths';
 
@@ -16,7 +16,6 @@ export function ProjectListPage() {
   // 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
-  const [newProjectDescription, setNewProjectDescription] = useState('');
 
   const handleCreateProject = async () => {
     if (!newProjectName.trim()) {
@@ -25,14 +24,11 @@ export function ProjectListPage() {
     }
 
     try {
-      const trimmedDescription = newProjectDescription.trim();
       const project = await createProjectMutation.mutateAsync({
         name: newProjectName.trim(),
-        ...(trimmedDescription && { description: trimmedDescription }),
       });
       setIsModalOpen(false);
       setNewProjectName('');
-      setNewProjectDescription('');
       navigate(getProjectPath(project.id));
     } catch (err) {
       console.error('Failed to create project:', err);
@@ -43,7 +39,6 @@ export function ProjectListPage() {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setNewProjectName('');
-    setNewProjectDescription('');
   };
 
   if (isLoading) {
@@ -119,25 +114,6 @@ export function ProjectListPage() {
                   <ProjectName>{project.name}</ProjectName>
                   <ProjectId>{project.id}</ProjectId>
                 </ProjectHeader>
-
-                {project.description && <ProjectDescription>{project.description}</ProjectDescription>}
-
-                <ProjectStats>
-                  <StatItem>
-                    <Activity size={14} />
-                    <span>{project.jobCount}개 Job</span>
-                  </StatItem>
-                  {project.lastJobAt && (
-                    <StatItem>
-                      <Clock size={14} />
-                      <span>{formatRelativeTime(project.lastJobAt)}</span>
-                    </StatItem>
-                  )}
-                </ProjectStats>
-
-                <ProjectFooter>
-                  <CreatedAt>생성: {formatDate(project.createdAt)}</CreatedAt>
-                </ProjectFooter>
               </ProjectCard>
             ))}
 
@@ -178,16 +154,6 @@ export function ProjectListPage() {
                   autoFocus
                 />
               </FormGroup>
-
-              <FormGroup>
-                <Label>설명 (선택)</Label>
-                <Input
-                  type="text"
-                  placeholder="프로젝트에 대한 간단한 설명"
-                  value={newProjectDescription}
-                  onChange={(e) => setNewProjectDescription(e.target.value)}
-                />
-              </FormGroup>
             </ModalBody>
 
             <ModalFooter>
@@ -201,40 +167,6 @@ export function ProjectListPage() {
       )}
     </Container>
   );
-}
-
-/**
- * 상대 시간 포맷
- */
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffMins < 1) {
-    return '방금 전';
-  }
-  if (diffMins < 60) {
-    return `${diffMins}분 전`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}시간 전`;
-  }
-  return `${diffDays}일 전`;
-}
-
-/**
- * 날짜 포맷
- */
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
 }
 
 /* Styles */
@@ -413,41 +345,6 @@ const ProjectId = styled.code`
   font-size: 12px;
   color: ${(props) => props.theme.color.baseColor5};
   font-family: monospace;
-`;
-
-const ProjectDescription = styled.p`
-  font-size: 14px;
-  color: ${(props) => props.theme.color.baseColor6};
-  margin: 0 0 16px 0;
-  line-height: 1.5;
-`;
-
-const ProjectStats = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-`;
-
-const StatItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: ${(props) => props.theme.color.green1};
-
-  span {
-    color: ${(props) => props.theme.color.baseColor6};
-  }
-`;
-
-const ProjectFooter = styled.div`
-  padding-top: 12px;
-  border-top: 1px solid ${(props) => props.theme.color.border1};
-`;
-
-const CreatedAt = styled.span`
-  font-size: 12px;
-  color: ${(props) => props.theme.color.baseColor5};
 `;
 
 /* Empty State */

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { ProjectListResponse, ProjectDetailData, Project } from '../types/project';
-import { JobStatus } from '../types/whiteboard';
+import { JobStatus, type JobMetadata, type CloudWatchResponse } from '../types/whiteboard';
 import { BASE_URL } from '../constants/api';
 
 /**
@@ -10,38 +10,18 @@ let mockProjects: Project[] = [
   {
     id: 'proj-001',
     name: 'Data Pipeline',
-    description: '데이터 처리 파이프라인 프로젝트',
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    jobCount: 142,
-    lastJobAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
   },
   {
     id: 'proj-002',
     name: 'ML Training',
-    description: '머신러닝 모델 학습 프로젝트',
-    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    jobCount: 87,
-    lastJobAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: 'proj-003',
     name: 'API Server',
-    description: 'REST API 서버 프로젝트',
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    jobCount: 56,
-    lastJobAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
   },
   {
     id: 'proj-004',
     name: 'Batch Jobs',
-    description: '배치 작업 자동화',
-    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    jobCount: 234,
-    lastJobAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
@@ -62,67 +42,63 @@ const generateResourceHistory = () => {
 };
 
 /**
- * 프로젝트별 Mock Job 데이터 생성
+ * 프로젝트별 Mock Job 데이터 생성 (새로운 스키마)
  */
-const generateMockJobs = (projectId: string) => {
-  const baseJobs = [
+const generateMockJobs = (projectId: string): JobMetadata[] => {
+  const baseJobs: JobMetadata[] = [
     {
-      id: `${projectId}-job-001`,
+      job_id: `${projectId}-job-001`,
+      project: projectId,
+      message: '데이터 파이프라인 실행 중',
       status: JobStatus.RUNNING,
-      language: 'Python',
-      startedAt: new Date(Date.now() - 30000).toISOString(),
-      duration: 30000,
     },
     {
-      id: `${projectId}-job-002`,
+      job_id: `${projectId}-job-002`,
+      project: projectId,
+      message: '배치 작업 완료',
       status: JobStatus.SUCCESS,
-      language: 'JavaScript',
-      startedAt: new Date(Date.now() - 120000).toISOString(),
-      completedAt: new Date(Date.now() - 60000).toISOString(),
-      duration: 60000,
     },
     {
-      id: `${projectId}-job-003`,
+      job_id: `${projectId}-job-003`,
+      project: projectId,
+      message: 'API 서버 테스트 실행 중',
       status: JobStatus.RUNNING,
-      language: 'Java',
-      startedAt: new Date(Date.now() - 45000).toISOString(),
-      duration: 45000,
     },
     {
-      id: `${projectId}-job-004`,
+      job_id: `${projectId}-job-004`,
+      project: projectId,
+      message: 'ML 모델 학습 완료',
       status: JobStatus.SUCCESS,
-      language: 'Python',
-      startedAt: new Date(Date.now() - 300000).toISOString(),
-      completedAt: new Date(Date.now() - 270000).toISOString(),
-      duration: 30000,
     },
     {
-      id: `${projectId}-job-005`,
+      job_id: `${projectId}-job-005`,
+      project: projectId,
+      message: '메모리 초과로 인한 실패',
       status: JobStatus.FAILED,
-      language: 'Python',
-      startedAt: new Date(Date.now() - 180000).toISOString(),
-      completedAt: new Date(Date.now() - 150000).toISOString(),
-      duration: 30000,
     },
     {
-      id: `${projectId}-job-006`,
-      status: JobStatus.QUEUED,
-      language: 'TypeScript',
-      startedAt: new Date(Date.now() - 5000).toISOString(),
+      job_id: `${projectId}-job-006`,
+      project: projectId,
+      message: '실행 대기 중',
+      status: JobStatus.PENDING,
     },
     {
-      id: `${projectId}-job-007`,
+      job_id: `${projectId}-job-007`,
+      project: projectId,
+      message: '데이터 처리 완료',
       status: JobStatus.SUCCESS,
-      language: 'JavaScript',
-      startedAt: new Date(Date.now() - 600000).toISOString(),
-      completedAt: new Date(Date.now() - 540000).toISOString(),
-      duration: 60000,
     },
     {
-      id: `${projectId}-job-008`,
-      status: JobStatus.UPLOADING,
-      language: 'Python',
-      startedAt: new Date(Date.now() - 2000).toISOString(),
+      job_id: `${projectId}-job-008`,
+      project: projectId,
+      message: '실행 시간 초과',
+      status: JobStatus.TIMEOUT,
+    },
+    {
+      job_id: `${projectId}-job-009`,
+      project: projectId,
+      message: '사용자에 의해 취소됨',
+      status: JobStatus.CANCELLED,
     },
   ];
   return baseJobs;
@@ -148,18 +124,14 @@ export const handlers = [
 
   /**
    * 프로젝트 생성
-   * POST /api/projects
+   * POST /api/project
    */
-  http.post(`${BASE_URL}/api/projects`, async ({ request }) => {
-    const body = (await request.json()) as { name: string; description?: string };
+  http.post(`${BASE_URL}/api/project`, async ({ request }) => {
+    const body = (await request.json()) as { name: string };
 
     const newProject: Project = {
       id: `proj-${Date.now()}`,
       name: body.name,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      jobCount: 0,
-      ...(body.description && { description: body.description }),
     };
 
     mockProjects = [newProject, ...mockProjects];
@@ -179,34 +151,51 @@ export const handlers = [
       return new HttpResponse(null, { status: 404 });
     }
 
+    const mockJobCount = 100 + Math.floor(Math.random() * 100);
     const response: ProjectDetailData = {
       project,
       systemMetrics: {
         activeJobsCount: 3 + Math.floor(Math.random() * 5),
         cpuUsagePercent: 40 + Math.random() * 40,
         memoryUsagePercent: 30 + Math.random() * 40,
-        totalJobsToday: project.jobCount,
+        totalJobsToday: mockJobCount,
         successRate: 90 + Math.random() * 8,
         lastUpdated: new Date().toISOString(),
       },
       recentJobs: generateMockJobs(projectId),
       resourceHistory: generateResourceHistory(),
       jobStatusStats: [
-        { status: JobStatus.SUCCESS, count: Math.floor(project.jobCount * 0.85) },
+        { status: JobStatus.SUCCESS, count: Math.floor(mockJobCount * 0.85) },
         { status: JobStatus.RUNNING, count: 3 },
-        { status: JobStatus.FAILED, count: Math.floor(project.jobCount * 0.05) },
-        { status: JobStatus.QUEUED, count: 2 },
-        { status: JobStatus.UPLOADING, count: 1 },
+        { status: JobStatus.FAILED, count: Math.floor(mockJobCount * 0.05) },
+        { status: JobStatus.PENDING, count: 2 },
+        { status: JobStatus.TIMEOUT, count: 1 },
       ],
       languageStats: [
-        { language: 'Python', count: Math.floor(project.jobCount * 0.4) },
-        { language: 'JavaScript', count: Math.floor(project.jobCount * 0.3) },
-        { language: 'TypeScript', count: Math.floor(project.jobCount * 0.15) },
-        { language: 'Java', count: Math.floor(project.jobCount * 0.15) },
+        { language: 'Python', count: Math.floor(mockJobCount * 0.4) },
+        { language: 'JavaScript', count: Math.floor(mockJobCount * 0.3) },
+        { language: 'TypeScript', count: Math.floor(mockJobCount * 0.15) },
+        { language: 'Java', count: Math.floor(mockJobCount * 0.15) },
       ],
     };
 
     return HttpResponse.json(response);
+  }),
+
+  /**
+   * 프로젝트 실행 이력(Job 목록) 조회
+   * GET /api/projects/:projectId/jobs
+   */
+  http.get(`${BASE_URL}/api/projects/:projectId/jobs`, ({ params }) => {
+    const { projectId } = params as { projectId: string };
+    const project = mockProjects.find((p) => p.id === projectId);
+
+    if (!project) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    const jobs = generateMockJobs(projectId);
+    return HttpResponse.json(jobs);
   }),
 
   /**

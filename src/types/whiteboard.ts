@@ -1,19 +1,18 @@
 export enum JobStatus {
-  UPLOADING = 'Uploading',
-  QUEUED = 'Queued',
-  RUNNING = 'Running',
-  SUCCESS = 'Success',
-  FAILED = 'Failed',
+  PENDING = 'PENDING',
+  RUNNING = 'RUNNING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  TIMEOUT = 'TIMEOUT',
+  CANCELLED = 'CANCELLED',
 }
 
 export type JobMetadata = {
-  id: string;
+  job_id: string;
+  project: string;
+  code_key?: string;
+  message: string;
   status: JobStatus;
-  language: string;
-  startedAt: string;
-  completedAt?: string;
-  duration?: number;
-  userId?: string;
 };
 
 export type SystemMetrics = {
@@ -29,6 +28,23 @@ export type ResourceHistoryPoint = {
   timestamp: string;
   cpuUsagePercent: number;
   memoryUsagePercent: number;
+};
+
+/**
+ * CloudWatch 메트릭 데이터 포인트
+ */
+export type CloudWatchMetric = {
+  timestamp: string;
+  cpu_utilization: number;
+  memory_utilization: number;
+};
+
+/**
+ * CloudWatch API 응답
+ */
+export type CloudWatchResponse = {
+  cluster_name: string;
+  metrics: CloudWatchMetric[];
 };
 
 export type JobStatusStats = {

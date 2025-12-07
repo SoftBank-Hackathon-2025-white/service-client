@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowLeft, Upload } from 'lucide-react';
 import { useProjectDashboard } from '../../api/project';
-import { submitCode } from '../../api/execution';
+import { submitCode, useProjectJobs } from '../../api/execution';
 import { getJobExecutionPath, PATHS } from '../../constants/paths';
 import SystemMetricsCard from '../whiteboard/SystemMetricsCard';
 import JobListTable from '../whiteboard/JobListTable';
@@ -42,6 +42,7 @@ export function ProjectDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data, isLoading, isError, error } = useProjectDashboard(projectId);
+  const { data: jobsData, isLoading: isJobsLoading } = useProjectJobs(projectId, activeTab === 'history');
 
   const handleSubmit = async () => {
     if (!code.trim() || !projectId) {
@@ -112,7 +113,6 @@ export function ProjectDetailPage() {
           <ProjectIcon>📁</ProjectIcon>
           {data.project.name}
         </HeaderTitle>
-        {data.project.description && <HeaderSubtitle>{data.project.description}</HeaderSubtitle>}
       </Header>
 
       <TabContainer>
@@ -152,7 +152,15 @@ export function ProjectDetailPage() {
           </UploadSection>
         )}
 
-        {activeTab === 'history' && <JobListTable jobs={data.recentJobs} onJobClick={handleJobClick} />}
+        {activeTab === 'history' &&
+          (isJobsLoading ? (
+            <LoadingContainer>
+              <Spinner />
+              <LoadingText>실행 이력을 불러오는 중...</LoadingText>
+            </LoadingContainer>
+          ) : (
+            <JobListTable jobs={jobsData || []} onJobClick={handleJobClick} />
+          ))}
 
         {activeTab === 'monitoring' && (
           <>
@@ -221,12 +229,6 @@ const HeaderTitle = styled.h1`
 
 const ProjectIcon = styled.span`
   font-size: 36px;
-`;
-
-const HeaderSubtitle = styled.p`
-  font-size: 16px;
-  color: ${(props) => props.theme.color.baseColor6};
-  margin: 0;
 `;
 
 const TabContainer = styled.div`

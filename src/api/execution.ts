@@ -2,14 +2,37 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import client from './_client';
 import { API_ENDPOINTS } from '../constants/api';
 import type { CodeSubmitRequest, CodeSubmitResponse } from '../types/project';
+import type { JobMetadata } from '../types/whiteboard';
 
 /**
  * Query Keys
  */
 export const executionKeys = {
   all: ['executions'] as const,
+  jobs: (projectId: string) => ['executions', projectId, 'jobs'] as const,
   detail: (projectId: string, jobId: string) => ['executions', projectId, jobId] as const,
   status: (projectId: string, jobId: string) => ['executions', projectId, jobId, 'status'] as const,
+};
+
+/**
+ * 프로젝트 실행 이력(Job 목록) 조회 API
+ * GET /api/projects/{projectId}/jobs
+ */
+const fetchProjectJobs = async (projectId: string): Promise<JobMetadata[]> => {
+  const response = await client.get(API_ENDPOINTS.JOBS(projectId));
+  return response.data as JobMetadata[];
+};
+
+/**
+ * 프로젝트 실행 이력 조회 React Query Hook
+ */
+export const useProjectJobs = (projectId: string | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: executionKeys.jobs(projectId || ''),
+    queryFn: () => fetchProjectJobs(projectId!),
+    enabled: enabled && !!projectId,
+    staleTime: 30000,
+  });
 };
 
 /**

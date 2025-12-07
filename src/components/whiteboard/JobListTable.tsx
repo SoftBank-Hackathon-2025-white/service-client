@@ -14,26 +14,6 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs, onJobClick }) => {
 
   const filteredJobs = filterStatus === 'ALL' ? jobs : jobs.filter((job) => job.status === filterStatus);
 
-  const formatDuration = (duration?: number) => {
-    if (!duration) return '-';
-    const seconds = Math.floor(duration / 1000);
-    if (seconds < 60) return `${seconds}초`;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}분 ${remainingSeconds}초`;
-  };
-
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString('ko-KR', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
   return (
     <Container>
       <Header>
@@ -56,32 +36,32 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs, onJobClick }) => {
             <tr>
               <Th>Job ID</Th>
               <Th>상태</Th>
-              <Th>언어</Th>
-              <Th>시작 시간</Th>
-              <Th>실행 시간</Th>
+              <Th>프로젝트</Th>
+              <Th>메시지</Th>
             </tr>
           </thead>
           <tbody>
             {filteredJobs.length === 0 ? (
               <tr>
-                <Td colSpan={5}>
+                <Td colSpan={4}>
                   <EmptyMessage>실행 이력이 없습니다.</EmptyMessage>
                 </Td>
               </tr>
             ) : (
               filteredJobs.map((job) => (
-                <Tr key={job.id} $clickable={!!onJobClick} onClick={() => onJobClick?.(job.id)}>
+                <Tr key={job.job_id} $clickable={!!onJobClick} onClick={() => onJobClick?.(job.job_id)}>
                   <Td>
-                    <JobId>{job.id.substring(0, 8)}</JobId>
+                    <JobIdCell>{job.job_id.length > 16 ? `${job.job_id.substring(0, 16)}...` : job.job_id}</JobIdCell>
                   </Td>
                   <Td>
                     <StatusBadge status={job.status} />
                   </Td>
                   <Td>
-                    <Language>{job.language}</Language>
+                    <ProjectCell>{job.project}</ProjectCell>
                   </Td>
-                  <Td>{formatTime(job.startedAt)}</Td>
-                  <Td>{formatDuration(job.duration)}</Td>
+                  <Td>
+                    <MessageCell>{job.message}</MessageCell>
+                  </Td>
                 </Tr>
               ))
             )}
@@ -176,7 +156,7 @@ const Td = styled.td`
   border-bottom: 1px solid ${(props) => props.theme.color.baseColor3};
 `;
 
-const JobId = styled.code`
+const JobIdCell = styled.code`
   font-family: 'Courier New', monospace;
   font-size: 13px;
   color: ${(props) => props.theme.color.green1};
@@ -185,9 +165,14 @@ const JobId = styled.code`
   border-radius: 4px;
 `;
 
-const Language = styled.span`
+const ProjectCell = styled.span`
   font-weight: 500;
   color: ${(props) => props.theme.color.white};
+`;
+
+const MessageCell = styled.span`
+  color: ${(props) => props.theme.color.baseColor7};
+  font-size: 14px;
 `;
 
 const EmptyMessage = styled.div`

@@ -6,10 +6,12 @@ export const BASE_URL = import.meta.env['VITE_API_BASE_URL'];
 export const API_ENDPOINTS = {
   /** 프로젝트 목록 */
   PROJECTS: '/api/projects',
-  /** 프로젝트 상세 */
-  PROJECT_DETAIL: (projectId: string) => `/api/projects/${projectId}`,
+  /** 프로젝트 생성 */
+  PROJECT_CREATE: '/api/project',
   /** 프로젝트 대시보드 데이터 */
   PROJECT_DASHBOARD: (projectId: string) => `/api/projects/${projectId}/dashboard`,
+  /** 프로젝트별 Job 목록 (실행 이력) */
+  JOBS: (projectId: string) => `/api/projects/${projectId}/jobs`,
   /** 코드 업로드 (프로젝트 산하) */
   UPLOAD: (projectId: string) => `/api/projects/${projectId}/upload`,
   /** 실행 트리거 */
