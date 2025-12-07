@@ -11,6 +11,7 @@ import ResourceHistoryChart from '../whiteboard/ResourceHistoryChart';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { CodeEditor } from '../common/CodeEditor';
 import { SubmitButton } from '../common/SubmitButton';
+import { FormInput } from '../common/FormInput';
 
 type TabType = 'upload' | 'history' | 'monitoring';
 
@@ -37,6 +38,8 @@ export function ProjectDetailPage() {
   // 코드 업로드 상태
   const [language, setLanguage] = useState<'python' | 'node' | 'java'>('python');
   const [code, setCode] = useState('');
+  const [functionName, setFunctionName] = useState('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: projectsData, isLoading, isError, error } = useProjects();
@@ -57,11 +60,27 @@ export function ProjectDetailPage() {
       return;
     }
 
+    if (!functionName.trim()) {
+      alert('함수 이름을 입력해주세요.');
+      return;
+    }
+
+    if (!description.trim()) {
+      alert('설명을 입력해주세요.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const { jobId } = await submitCode({ projectId, code, language });
-      navigate(getJobExecutionPath(projectId, jobId));
+      const jobMetadata = await submitCode({
+        code,
+        description,
+        function_name: functionName,
+        language,
+        project: projectId,
+      });
+      navigate(getJobExecutionPath(projectId, jobMetadata.job_id));
     } catch (err) {
       console.error('Failed to submit code:', err);
       alert('코드 제출에 실패했습니다. 다시 시도해주세요.');
@@ -160,15 +179,39 @@ export function ProjectDetailPage() {
               </UploadHeader>
 
               <FormSection>
+                <FormInput
+                  label="함수 이름"
+                  value={functionName}
+                  onChange={setFunctionName}
+                  placeholder="my_function"
+                  disabled={isSubmitting}
+                  required
+                />
+
+                <FormInput
+                  label="설명"
+                  value={description}
+                  onChange={setDescription}
+                  placeholder="이 함수가 수행하는 작업을 설명해주세요"
+                  disabled={isSubmitting}
+                  required
+                />
+
                 <LanguageSelector
                   value={language}
-                  onChange={(lang) => setLanguage(lang as 'python' | 'node' | 'java')}
+                  onChange={(lang) => {
+                    setLanguage(lang as 'python' | 'node' | 'java');
+                  }}
                   disabled={isSubmitting}
                 />
 
                 <CodeEditor value={code} onChange={setCode} language={language} disabled={isSubmitting} />
 
-                <SubmitButton onClick={handleSubmit} disabled={!code.trim()} isSubmitting={isSubmitting} />
+                <SubmitButton
+                  onClick={handleSubmit}
+                  disabled={!code.trim() || !functionName.trim() || !description.trim()}
+                  isSubmitting={isSubmitting}
+                />
               </FormSection>
             </UploadCard>
           </UploadSection>

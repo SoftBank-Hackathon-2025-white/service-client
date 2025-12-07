@@ -219,10 +219,18 @@ export const handlers = [
 
   /**
    * 코드 업로드
-   * POST /api/projects/:projectId/upload
+   * POST /api/upload
    */
-  http.post(`${BASE_URL}/api/projects/:projectId/upload`, async ({ params }) => {
-    const { projectId } = params as { projectId: string };
+  http.post(`${BASE_URL}/api/upload`, async ({ request }) => {
+    const body = (await request.json()) as {
+      code: string;
+      description: string;
+      function_name: string;
+      language: string;
+      project: string;
+    };
+
+    const projectId = body.project;
     const jobId = `${projectId}-job-${Date.now()}`;
 
     // Job 상태 초기화
@@ -232,11 +240,16 @@ export const handlers = [
       startTime: Date.now(),
     };
 
-    return HttpResponse.json({
+    // JobMetadata 반환
+    const jobMetadata: JobMetadata = {
       job_id: jobId,
-      project_id: projectId,
-      message: '코드가 성공적으로 업로드되었습니다.',
-    });
+      project: projectId,
+      code_key: `code-${Date.now()}`,
+      message: `${body.function_name} 함수가 업로드되었습니다.`,
+      status: JobStatus.PENDING,
+    };
+
+    return HttpResponse.json(jobMetadata);
   }),
 
   /**

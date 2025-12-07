@@ -11,8 +11,8 @@ export const API_ENDPOINTS = {
   PROJECT_CREATE: '/api/project',
   /** 프로젝트별 Job 목록 (실행 이력) */
   JOBS: (projectId: string) => `/api/projects/${projectId}/jobs`,
-  /** 코드 업로드 (프로젝트 산하) */
-  UPLOAD: (projectId: string) => `/api/projects/${projectId}/upload`,
+  /** 코드 업로드 */
+  UPLOAD: '/api/upload',
   /** 실행 트리거 */
   EXECUTE: (projectId: string, jobId: string) => `/api/projects/${projectId}/jobs/${jobId}/execute`,
   /** 실행 상태 조회 */

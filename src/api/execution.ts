@@ -38,31 +38,37 @@ export const useProjectJobs = (projectId: string | undefined, enabled = true) =>
 /**
  * 코드 제출 API
  *
- * 1) POST /api/projects/{projectId}/upload 로 코드 업로드
+ * 1) POST /api/upload 로 코드 업로드 (JobMetadata 반환)
  * 2) POST /api/projects/{projectId}/jobs/{job_id}/execute 로 실행 트리거
- * 3) 최종적으로 { jobId, projectId } 반환
+ * 3) 최종적으로 JobMetadata 반환
  */
 export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmitResponse> => {
-  const { projectId, code, language } = request;
+  const { code, description, function_name, language, project } = request;
 
   // 개행문자(\n, \r) 제거
   const sanitizedCode = code.replace(/[\r\n]/g, '');
 
-  // 1. 업로드
-  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD(projectId), { code: sanitizedCode, language });
-  const uploadData = uploadResponse.data as any;
+  // 1. 업로드 (JobMetadata 반환)
+  const uploadResponse = await client.post(API_ENDPOINTS.UPLOAD, {
+    code: sanitizedCode,
+    description,
+    function_name,
+    language,
+    project,
+  });
+  const jobMetadata = uploadResponse.data as CodeSubmitResponse;
 
-  const jobId: string = uploadData.job_id || uploadData.jobId;
+  const jobId: string = jobMetadata.job_id;
 
   if (!jobId) {
     throw new Error('업로드 응답에 job_id 가 없습니다.');
   }
 
   // 2. 실행 트리거
-  await client.post(API_ENDPOINTS.EXECUTE(projectId, jobId));
+  await client.post(API_ENDPOINTS.EXECUTE(project, jobId));
 
-  // 3. 프론트에서 사용하기 좋은 형태로 반환
-  return { jobId, projectId };
+  // 3. JobMetadata 반환
+  return jobMetadata;
 };
 
 /**
