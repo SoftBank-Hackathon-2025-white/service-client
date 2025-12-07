@@ -42,6 +42,25 @@ const generateResourceHistory = () => {
 };
 
 /**
+ * CloudWatch 메트릭 생성 함수
+ */
+const generateCloudWatchMetrics = (clusterName: string): CloudWatchResponse => {
+  const metrics = [];
+  const now = Date.now();
+  for (let i = 29; i >= 0; i--) {
+    metrics.push({
+      timestamp: new Date(now - i * 60000).toISOString(), // 1분 간격
+      cpu_utilization: Math.round((30 + Math.random() * 50) * 100) / 100,
+      memory_utilization: Math.round((40 + Math.random() * 40) * 100) / 100,
+    });
+  }
+  return {
+    cluster_name: clusterName,
+    metrics,
+  };
+};
+
+/**
  * 프로젝트별 Mock Job 데이터 생성 (새로운 스키마)
  */
 const generateMockJobs = (projectId: string): JobMetadata[] => {
@@ -299,5 +318,15 @@ export const handlers = [
         cpuUsage: 30,
       },
     });
+  }),
+
+  /**
+   * CloudWatch 메트릭 조회
+   * GET /api/cloudwatch/:clusterName
+   */
+  http.get(`${BASE_URL}/api/cloudwatch/:clusterName`, ({ params }) => {
+    const { clusterName } = params as { clusterName: string };
+    const response = generateCloudWatchMetrics(clusterName);
+    return HttpResponse.json(response);
   }),
 ];

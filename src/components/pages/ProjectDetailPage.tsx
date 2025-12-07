@@ -4,12 +4,10 @@ import styled from 'styled-components';
 import { ArrowLeft, Upload } from 'lucide-react';
 import { useProjectDashboard } from '../../api/project';
 import { submitCode, useProjectJobs } from '../../api/execution';
+import { useCloudWatchMetrics } from '../../api/monitoring';
 import { getJobExecutionPath, PATHS } from '../../constants/paths';
-import SystemMetricsCard from '../whiteboard/SystemMetricsCard';
 import JobListTable from '../whiteboard/JobListTable';
 import ResourceHistoryChart from '../whiteboard/ResourceHistoryChart';
-import JobStatusChart from '../whiteboard/JobStatusChart';
-import LanguageStatsChart from '../whiteboard/LanguageStatsChart';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { CodeEditor } from '../common/CodeEditor';
 import { SubmitButton } from '../common/SubmitButton';
@@ -43,6 +41,7 @@ export function ProjectDetailPage() {
 
   const { data, isLoading, isError, error } = useProjectDashboard(projectId);
   const { data: jobsData, isLoading: isJobsLoading } = useProjectJobs(projectId, activeTab === 'history');
+  const { data: cloudWatchData, isLoading: isCloudWatchLoading } = useCloudWatchMetrics(activeTab === 'monitoring');
 
   const handleSubmit = async () => {
     if (!code.trim() || !projectId) {
@@ -162,16 +161,52 @@ export function ProjectDetailPage() {
             <JobListTable jobs={jobsData || []} onJobClick={handleJobClick} />
           ))}
 
-        {activeTab === 'monitoring' && (
-          <>
-            <SystemMetricsCard metrics={data.systemMetrics} />
-            <ChartsGrid>
-              <ResourceHistoryChart data={data.resourceHistory} />
-              <JobStatusChart data={data.jobStatusStats} />
-              <LanguageStatsChart data={data.languageStats} />
-            </ChartsGrid>
-          </>
-        )}
+        {activeTab === 'monitoring' &&
+          (isCloudWatchLoading ? (
+            <LoadingContainer>
+              <Spinner />
+              <LoadingText>모니터링 데이터를 불러오는 중...</LoadingText>
+            </LoadingContainer>
+          ) : cloudWatchData ? (
+            <MonitoringSection>
+              <MonitoringHeader>
+                <MonitoringTitle>클러스터 모니터링</MonitoringTitle>
+                <ClusterInfo>
+                  <ClusterLabel>클러스터:</ClusterLabel>
+                  <ClusterName>{cloudWatchData.cluster_name}</ClusterName>
+                </ClusterInfo>
+              </MonitoringHeader>
+              <MetricsSummary>
+                <MetricCard>
+                  <MetricIcon>💻</MetricIcon>
+                  <MetricContent>
+                    <MetricLabel>현재 CPU 사용률</MetricLabel>
+                    <MetricValue $color="#3B82F6">
+                      {cloudWatchData.metrics.length > 0
+                        ? (cloudWatchData.metrics.at(-1)?.cpu_utilization ?? 0).toFixed(1)
+                        : 0}
+                      %
+                    </MetricValue>
+                  </MetricContent>
+                </MetricCard>
+                <MetricCard>
+                  <MetricIcon>🧠</MetricIcon>
+                  <MetricContent>
+                    <MetricLabel>현재 메모리 사용률</MetricLabel>
+                    <MetricValue $color="#8B5CF6">
+                      {cloudWatchData.metrics.length > 0
+                        ? (cloudWatchData.metrics.at(-1)?.memory_utilization ?? 0).toFixed(1)
+                        : 0}
+                      %
+                    </MetricValue>
+                  </MetricContent>
+                </MetricCard>
+              </MetricsSummary>
+              <ResourceHistoryChart data={cloudWatchData.metrics} clusterName={cloudWatchData.cluster_name} />
+            </MonitoringSection>
+          ) : (
+            <EmptyState>모니터링 데이터가 없습니다.</EmptyState>
+          ))}
       </Content>
     </Container>
   );
@@ -273,14 +308,104 @@ const Content = styled.div`
   gap: 24px;
 `;
 
-const ChartsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+const MonitoringSection = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 24px;
+`;
 
-  @media (max-width: 1200px) {
-    grid-template-columns: 1fr;
+const MonitoringHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
+
+const MonitoringTitle = styled.h2`
+  font-size: 24px;
+  font-weight: 700;
+  color: ${(props) => props.theme.color.white};
+  margin: 0;
+`;
+
+const ClusterInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: ${(props) => props.theme.color.cardBackground};
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid ${(props) => props.theme.color.cardBorder};
+`;
+
+const ClusterLabel = styled.span`
+  font-size: 14px;
+  color: ${(props) => props.theme.color.baseColor6};
+`;
+
+const ClusterName = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${(props) => props.theme.color.green1};
+`;
+
+const MetricsSummary = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+`;
+
+const MetricCard = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: ${(props) => props.theme.color.cardBackground};
+  backdrop-filter: blur(10px);
+  border: 1px solid ${(props) => props.theme.color.cardBorder};
+  border-radius: 16px;
+  padding: 20px 24px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
+`;
+
+const MetricIcon = styled.div`
+  font-size: 32px;
+`;
+
+const MetricContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const MetricLabel = styled.span`
+  font-size: 12px;
+  color: ${(props) => props.theme.color.baseColor6};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const MetricValue = styled.span<{ $color: string }>`
+  font-size: 28px;
+  font-weight: 700;
+  color: ${(props) => props.$color};
+`;
+
+const EmptyState = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: ${(props) => props.theme.color.cardBackground};
+  border: 1px solid ${(props) => props.theme.color.cardBorder};
+  border-radius: 16px;
+  color: ${(props) => props.theme.color.baseColor6};
+  font-size: 16px;
 `;
 
 const LoadingContainer = styled.div`
