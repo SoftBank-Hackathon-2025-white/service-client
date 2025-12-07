@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import client from './_client';
 import { API_ENDPOINTS } from '../constants/api';
-import type { Project, ProjectListResponse, ProjectDetailData } from '../types/project';
+import type { Project, ProjectListResponse } from '../types/project';
 
 /**
  * 프로젝트 생성 요청 타입
@@ -17,7 +17,6 @@ export const projectKeys = {
   all: ['projects'] as const,
   list: () => [...projectKeys.all, 'list'] as const,
   detail: (projectId: string) => [...projectKeys.all, 'detail', projectId] as const,
-  dashboard: (projectId: string) => [...projectKeys.all, 'dashboard', projectId] as const,
 };
 
 /**
@@ -58,28 +57,5 @@ export const useCreateProject = () => {
       // 프로젝트 목록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: projectKeys.list() });
     },
-  });
-};
-
-/**
- * 프로젝트 대시보드 데이터 조회
- */
-export const fetchProjectDashboard = async (projectId: string): Promise<ProjectDetailData> => {
-  const response = await client.get<ProjectDetailData>(API_ENDPOINTS.PROJECT_DASHBOARD(projectId));
-  return response.data;
-};
-
-/**
- * 프로젝트 대시보드 React Query Hook
- */
-export const useProjectDashboard = (projectId: string | undefined) => {
-  return useQuery({
-    queryKey: projectKeys.dashboard(projectId || ''),
-    queryFn: () => fetchProjectDashboard(projectId!),
-    enabled: !!projectId,
-    refetchInterval: 3000,
-    staleTime: 2000,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };

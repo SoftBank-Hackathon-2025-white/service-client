@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowLeft, Upload } from 'lucide-react';
-import { useProjectDashboard } from '../../api/project';
+import { useProjects } from '../../api/project';
 import { submitCode, useProjectJobs } from '../../api/execution';
 import { useCloudWatchMetrics } from '../../api/monitoring';
 import { getJobExecutionPath, PATHS } from '../../constants/paths';
@@ -39,9 +39,17 @@ export function ProjectDetailPage() {
   const [code, setCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data, isLoading, isError, error } = useProjectDashboard(projectId);
+  const { data: projectsData, isLoading, isError, error } = useProjects();
   const { data: jobsData, isLoading: isJobsLoading } = useProjectJobs(projectId, activeTab === 'history');
   const { data: cloudWatchData, isLoading: isCloudWatchLoading } = useCloudWatchMetrics(activeTab === 'monitoring');
+
+  // 프로젝트 목록에서 현재 프로젝트 찾기
+  const project = useMemo(() => {
+    if (!projectsData?.projects || !projectId) {
+      return null;
+    }
+    return projectsData.projects.find((p) => p.id === projectId) || null;
+  }, [projectsData, projectId]);
 
   const handleSubmit = async () => {
     if (!code.trim() || !projectId) {
@@ -84,7 +92,7 @@ export function ProjectDetailPage() {
       <Container>
         <ErrorContainer>
           <ErrorIcon>⚠️</ErrorIcon>
-          <ErrorTitle>데이터를 불러올 수 없습니다</ErrorTitle>
+          <ErrorTitle>프로젝트 정보를 불러올 수 없습니다</ErrorTitle>
           <ErrorMessage>{error instanceof Error ? error.message : '서버와의 연결을 확인해주세요.'}</ErrorMessage>
           <BackButton onClick={() => navigate(PATHS.MAIN)}>
             <ArrowLeft size={16} />
@@ -95,7 +103,22 @@ export function ProjectDetailPage() {
     );
   }
 
-  if (!data) {
+  if (!project) {
+    if (!isLoading) {
+      return (
+        <Container>
+          <ErrorContainer>
+            <ErrorIcon>🔍</ErrorIcon>
+            <ErrorTitle>프로젝트를 찾을 수 없습니다</ErrorTitle>
+            <ErrorMessage>요청하신 프로젝트가 존재하지 않거나 삭제되었습니다.</ErrorMessage>
+            <BackButton onClick={() => navigate(PATHS.MAIN)}>
+              <ArrowLeft size={16} />
+              프로젝트 목록으로
+            </BackButton>
+          </ErrorContainer>
+        </Container>
+      );
+    }
     return null;
   }
 
@@ -110,7 +133,7 @@ export function ProjectDetailPage() {
         </HeaderTop>
         <HeaderTitle>
           <ProjectIcon>📁</ProjectIcon>
-          {data.project.name}
+          {project.name}
         </HeaderTitle>
       </Header>
 

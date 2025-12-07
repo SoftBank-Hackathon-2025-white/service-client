@@ -9,8 +9,6 @@ export const API_ENDPOINTS = {
   PROJECTS: '/api/projects',
   /** 프로젝트 생성 */
   PROJECT_CREATE: '/api/project',
-  /** 프로젝트 대시보드 데이터 */
-  PROJECT_DASHBOARD: (projectId: string) => `/api/projects/${projectId}/dashboard`,
   /** 프로젝트별 Job 목록 (실행 이력) */
   JOBS: (projectId: string) => `/api/projects/${projectId}/jobs`,
   /** 코드 업로드 (프로젝트 산하) */
