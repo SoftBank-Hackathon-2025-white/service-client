@@ -8,9 +8,9 @@ const guideAnnotation = {
 };
 
 const exampleCode: Record<string, string> = {
-  python: 'print("Hello, Snowflake!")',
-  node: 'console.log("Hello, Snowflake!");',
-  java: 'public static void main(String[] args) { System.out.println("Hello, Snowflake!"); }',
+  python: 'print("Hello, Lambda the Sea!")',
+  node: 'console.log("Hello, Lambda the Sea!");',
+  java: 'public static void main(String[] args) { System.out.println("Hello, Lambda the Sea!"); }',
 };
 interface CodeEditorProps {
   value: string;
@@ -50,7 +50,7 @@ export function CodeEditor({ value, onChange, language, disabled = false }: Code
       </EditorWrapper>
 
       <TipMessage>
-        💡 <strong>Tip:</strong> Tab 키로 들여쓰기를 할 수 있습니다. 코드를 입력한 후 하단의 "Snowflake 실행" 버튼을
+        💡 <strong>Tip:</strong> Tab 키로 들여쓰기를 할 수 있습니다. 코드를 입력한 후 하단의 "Lambda 실행" 버튼을
         클릭하세요.
       </TipMessage>
     </Container>

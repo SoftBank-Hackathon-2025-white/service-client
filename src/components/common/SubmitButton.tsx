@@ -9,12 +9,7 @@ interface SubmitButtonProps {
 
 export function SubmitButton({ onClick, disabled = false, isSubmitting = false }: SubmitButtonProps) {
   return (
-    <Button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || isSubmitting}
-      $isSubmitting={isSubmitting}
-    >
+    <Button type="button" onClick={onClick} disabled={disabled || isSubmitting} $isSubmitting={isSubmitting}>
       {isSubmitting ? (
         <>
           <SpinningIcon>
@@ -25,7 +20,7 @@ export function SubmitButton({ onClick, disabled = false, isSubmitting = false }
       ) : (
         <>
           <Play size={20} />
-          <span>Snowflake 실행</span>
+          <span>Lambda 실행</span>
         </>
       )}
     </Button>
@@ -43,11 +38,10 @@ const Button = styled.button<ButtonProps>`
   justify-content: center;
   gap: ${(props) => props.theme.spacing.sm};
   padding: ${(props) => props.theme.spacing.md} ${(props) => props.theme.spacing.xl};
-  background: ${(props) => 
-    props.$isSubmitting 
-      ? props.theme.color.baseColor3 
-      : `linear-gradient(135deg, ${props.theme.color.green1}, ${props.theme.color.green2})`
-  };
+  background: ${(props) =>
+    props.$isSubmitting
+      ? props.theme.color.baseColor3
+      : `linear-gradient(135deg, ${props.theme.color.green1}, ${props.theme.color.green2})`};
   color: ${(props) => props.theme.color.baseColor1};
   font-size: ${(props) => props.theme.fontSize.lg};
   font-weight: 600;

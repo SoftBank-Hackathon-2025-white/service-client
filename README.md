@@ -1,5 +1,10 @@
-# REACT Frontend 코드 저장소
+# Lambda the Sea - Frontend
 
+> **Serverless Lambda를 깨끗한 바다 속처럼 투명하게 보여주는 Observability 플랫폼**
+>
+> ECS 기반의 Serverless 모델로 다양한 언어를 실행시킬 수 있으며,
+> Lambda가 제공하지 않던 단계별 실행 흐름 시각화를 통해 Whitebox Execution을 제공합니다.
+>
 > 해당 코드 베이스는 특정 규칙을 따릅니다. 참고하여 개발하시길 바랍니다.
 
 ## Component

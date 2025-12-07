@@ -237,7 +237,7 @@ export function TracePage() {
 
             {/* 푸터 메시지 */}
             <FooterMessage initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-              ❄️ Snowflake - 순수하고 투명한 서버리스 실행 완료
+              🌊 Lambda the Sea - 깨끗하고 투명한 서버리스 실행 완료
             </FooterMessage>
           </SuccessSection>
         )}

@@ -13,9 +13,11 @@ declare module 'styled-components' {
       border1?: string;
       border2?: string;
       border3?: string;
-      skyBg1?: string;
-      skyBg2?: string;
+      oceanBg1?: string;
+      oceanBg2?: string;
+      oceanBg3?: string;
       shadow1?: string;
+      shadow2?: string;
       cardBorder?: string;
     };
     spacing: {

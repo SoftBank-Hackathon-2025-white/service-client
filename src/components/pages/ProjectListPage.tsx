@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Snowflake, FolderOpen, Plus, X } from 'lucide-react';
+import { Waves, FolderOpen, Plus, X } from 'lucide-react';
 import { useProjects, useCreateProject } from '../../api/project';
 import { getProjectPath } from '../../constants/paths';
 
@@ -72,12 +72,12 @@ export function ProjectListPage() {
           <HeroContent>
             <TitleWrapper>
               <IconWrapper>
-                <Snowflake size={56} color="#86c3bb" />
+                <Waves size={56} color="#14B8A6" />
                 <IconGlow />
               </IconWrapper>
-              <Title>Snowflake</Title>
+              <Title>Lambda the Sea</Title>
             </TitleWrapper>
-            <Subtitle>순수하고 투명한 서버리스 코드 실행 플랫폼</Subtitle>
+            <Subtitle>Serverless Lambda를 깨끗한 바다 속처럼 투명하게 보여주는 플랫폼</Subtitle>
 
             {/* 특징 배지 */}
             <FeatureBadges>
@@ -178,8 +178,10 @@ const Container = styled.div`
   background: linear-gradient(
     135deg,
     ${(props) => props.theme.color.baseColor1} 0%,
-    ${(props) => props.theme.color.baseColor2} 100%
+    ${(props) => props.theme.color.baseColor2} 50%,
+    ${(props) => props.theme.color.baseColor3} 100%
   );
+  position: relative;
 `;
 
 const ContentWrapper = styled.div`
@@ -191,7 +193,8 @@ const ContentWrapper = styled.div`
 const HeroSection = styled.div`
   padding: 60px 20px 40px;
   text-align: center;
-  border-bottom: 1px solid ${(props) => props.theme.color.border1};
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, transparent 100%);
 `;
 
 const HeroContent = styled.div`
@@ -214,9 +217,23 @@ const IconWrapper = styled.div`
 const IconGlow = styled.div`
   position: absolute;
   inset: -10px;
-  background: ${(props) => props.theme.color.green1}33;
+  background: ${(props) => props.theme.color.statusRunning};
+  opacity: 0.4;
   filter: blur(25px);
   border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.1);
+    }
+  }
 `;
 
 const Title = styled.h1`
@@ -229,8 +246,10 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 18px;
-  color: ${(props) => props.theme.color.baseColor6};
+  color: ${(props) => props.theme.color.baseColor7};
   margin: 0 0 24px 0;
+  font-weight: 400;
+  letter-spacing: 0.3px;
 `;
 
 const FeatureBadges = styled.div`
@@ -245,10 +264,12 @@ const FeatureBadge = styled.div`
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: ${(props) => props.theme.color.baseColor3};
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 20px;
   font-size: 13px;
-  color: ${(props) => props.theme.color.baseColor7};
+  color: ${(props) => props.theme.color.baseColor8};
+  backdrop-filter: blur(10px);
 
   span {
     font-size: 14px;
@@ -285,8 +306,8 @@ const SectionTitle = styled.h2`
 const ProjectCount = styled.span`
   font-size: 14px;
   font-weight: 500;
-  color: ${(props) => props.theme.color.baseColor6};
-  background: ${(props) => props.theme.color.baseColor3};
+  color: ${(props) => props.theme.color.baseColor8};
+  background: rgba(6, 182, 212, 0.2);
   padding: 4px 12px;
   border-radius: 20px;
 `;
@@ -296,7 +317,7 @@ const CreateButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: ${(props) => props.theme.color.green1};
+  background: ${(props) => props.theme.color.statusRunning};
   color: ${(props) => props.theme.color.baseColor1};
   border: none;
   border-radius: 10px;
@@ -307,7 +328,8 @@ const CreateButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(134, 195, 187, 0.4);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5);
+    background: ${(props) => props.theme.color.primaryDark};
   }
 `;
 
@@ -328,8 +350,9 @@ const ProjectCard = styled.div`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-    border-color: ${(props) => props.theme.color.green1};
+    box-shadow: 0 12px 24px rgba(6, 182, 212, 0.3);
+    border-color: ${(props) => props.theme.color.statusRunning};
+    background: rgba(6, 182, 212, 0.12);
   }
 `;
 
@@ -346,8 +369,11 @@ const ProjectName = styled.h3`
 
 const ProjectId = styled.code`
   font-size: 12px;
-  color: ${(props) => props.theme.color.baseColor5};
+  color: ${(props) => props.theme.color.baseColor6};
   font-family: monospace;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 `;
 
 /* Empty State */
@@ -360,7 +386,7 @@ const EmptyState = styled.div`
   padding: 60px 20px;
   background: ${(props) => props.theme.color.cardBackground};
   border-radius: ${(props) => props.theme.borderRadius.xl};
-  border: 2px dashed ${(props) => props.theme.color.border1};
+  border: 2px dashed rgba(6, 182, 212, 0.3);
 `;
 
 const EmptyIcon = styled.div`
@@ -395,7 +421,7 @@ const Spinner = styled.div`
   width: 48px;
   height: 48px;
   border: 4px solid ${(props) => props.theme.color.baseColor3};
-  border-top-color: ${(props) => props.theme.color.green1};
+  border-top-color: ${(props) => props.theme.color.statusRunning};
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
@@ -464,7 +490,7 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid ${(props) => props.theme.color.border1};
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
 `;
 
 const ModalTitle = styled.h2`
@@ -515,7 +541,7 @@ const Label = styled.label`
 const Input = styled.input`
   padding: 12px 16px;
   background: ${(props) => props.theme.color.baseColor3};
-  border: 1px solid ${(props) => props.theme.color.border1};
+  border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 8px;
   font-size: 14px;
   color: ${(props) => props.theme.color.white};
@@ -527,8 +553,8 @@ const Input = styled.input`
   }
 
   &:focus {
-    border-color: ${(props) => props.theme.color.green1};
-    box-shadow: 0 0 0 3px ${(props) => props.theme.color.green1}33;
+    border-color: ${(props) => props.theme.color.statusRunning};
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
   }
 `;
 
@@ -537,13 +563,13 @@ const ModalFooter = styled.div`
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid ${(props) => props.theme.color.border1};
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
 `;
 
 const CancelButton = styled.button`
   padding: 10px 20px;
   background: transparent;
-  border: 1px solid ${(props) => props.theme.color.border1};
+  border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -552,19 +578,20 @@ const CancelButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props) => props.theme.color.baseColor3};
+    background: rgba(6, 182, 212, 0.1);
+    border-color: ${(props) => props.theme.color.statusRunning};
     color: ${(props) => props.theme.color.white};
   }
 `;
 
 const SubmitButton = styled.button`
   padding: 10px 20px;
-  background: ${(props) => props.theme.color.green1};
+  background: ${(props) => props.theme.color.statusRunning};
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: ${(props) => props.theme.color.baseColor1};
+  color: ${(props) => props.theme.color.white};
   cursor: pointer;
   transition: all 0.2s;
 
