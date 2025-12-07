@@ -14,7 +14,7 @@ export const API_ENDPOINTS = {
   /** 코드 업로드 */
   UPLOAD: '/api/upload',
   /** 실행 트리거 */
-  EXECUTE: (projectId: string, jobId: string) => `/api/projects/${projectId}/jobs/${jobId}/execute`,
+  EXECUTE: (jobId: string) => `/api/execute/${jobId}`,
   /** 실행 상태 조회 */
   STATUS: (projectId: string, jobId: string) => `/api/projects/${projectId}/jobs/${jobId}/status`,
   /** CloudWatch 메트릭 조회 */

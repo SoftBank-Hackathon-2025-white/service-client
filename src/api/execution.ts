@@ -39,7 +39,7 @@ export const useProjectJobs = (projectId: string | undefined, enabled = true) =>
  * 코드 제출 API
  *
  * 1) POST /api/upload 로 코드 업로드 (JobMetadata 반환)
- * 2) POST /api/projects/{projectId}/jobs/{job_id}/execute 로 실행 트리거
+ * 2) POST /api/execute/{job_id} 로 실행 트리거
  * 3) 최종적으로 JobMetadata 반환
  */
 export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmitResponse> => {
@@ -65,7 +65,7 @@ export const submitCode = async (request: CodeSubmitRequest): Promise<CodeSubmit
   }
 
   // 2. 실행 트리거
-  await client.post(API_ENDPOINTS.EXECUTE(project, jobId));
+  await client.post(API_ENDPOINTS.EXECUTE(jobId));
 
   // 3. JobMetadata 반환
   return jobMetadata;

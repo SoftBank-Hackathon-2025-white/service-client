@@ -254,10 +254,14 @@ export const handlers = [
 
   /**
    * 실행 트리거
-   * POST /api/projects/:projectId/jobs/:jobId/execute
+   * POST /api/execute/:jobId
    */
-  http.post(`${BASE_URL}/api/projects/:projectId/jobs/:jobId/execute`, ({ params }) => {
-    const { projectId, jobId } = params as { projectId: string; jobId: string };
+  http.post(`${BASE_URL}/api/execute/:jobId`, ({ params }) => {
+    const { jobId } = params as { jobId: string };
+
+    // jobId에서 projectId 추출 (job-001 형식에서 projectId 추출)
+    const parts = jobId.split('-job-');
+    const projectId = parts[0] || 'unknown-project';
     const key = `${projectId}-${jobId}`;
 
     if (jobStatusStore[key]) {
@@ -265,10 +269,15 @@ export const handlers = [
       jobStatusStore[key].progress = 25;
     }
 
-    return HttpResponse.json({
-      message: '실행이 시작되었습니다.',
+    // JobMetadata 형식으로 반환
+    const jobMetadata: JobMetadata = {
       job_id: jobId,
-    });
+      project: projectId,
+      message: '실행이 시작되었습니다.',
+      status: JobStatus.PENDING,
+    };
+
+    return HttpResponse.json(jobMetadata);
   }),
 
   /**
