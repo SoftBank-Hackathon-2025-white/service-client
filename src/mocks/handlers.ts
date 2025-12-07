@@ -8,20 +8,20 @@ import { BASE_URL } from '../constants/api';
  */
 let mockProjects: Project[] = [
   {
-    id: 'proj-001',
-    name: 'Data Pipeline',
+    project_id: 1,
+    project: 'Data Pipeline',
   },
   {
-    id: 'proj-002',
-    name: 'ML Training',
+    project_id: 2,
+    project: 'ML Training',
   },
   {
-    id: 'proj-003',
-    name: 'API Server',
+    project_id: 3,
+    project: 'API Server',
   },
   {
-    id: 'proj-004',
-    name: 'Batch Jobs',
+    project_id: 4,
+    project: 'Batch Jobs',
   },
 ];
 
@@ -134,10 +134,7 @@ export const handlers = [
    * GET /api/projects
    */
   http.get(`${BASE_URL}/api/projects`, () => {
-    const response: ProjectListResponse = {
-      projects: mockProjects,
-      total: mockProjects.length,
-    };
+    const response: ProjectListResponse = mockProjects;
     return HttpResponse.json(response);
   }),
 
@@ -149,8 +146,8 @@ export const handlers = [
     const body = (await request.json()) as { name: string };
 
     const newProject: Project = {
-      id: `proj-${Date.now()}`,
-      name: body.name,
+      project_id: Date.now(),
+      project: body.name,
     };
 
     mockProjects = [newProject, ...mockProjects];
@@ -164,15 +161,14 @@ export const handlers = [
    */
   http.get(`${BASE_URL}/api/projects/:projectId/dashboard`, ({ params }) => {
     const { projectId } = params as { projectId: string };
-    const project = mockProjects.find((p) => p.id === projectId);
-
-    if (!project) {
-      return new HttpResponse(null, { status: 404 });
-    }
+    const project = mockProjects.find((p) => p.project_id === Number(projectId));
 
     const mockJobCount = 100 + Math.floor(Math.random() * 100);
     const response: ProjectDetailData = {
-      project,
+      project: {
+        project_id: Number(projectId),
+        project: projectId,
+      },
       systemMetrics: {
         activeJobsCount: 3 + Math.floor(Math.random() * 5),
         cpuUsagePercent: 40 + Math.random() * 40,
@@ -207,7 +203,7 @@ export const handlers = [
    */
   http.get(`${BASE_URL}/api/projects/:projectId/jobs`, ({ params }) => {
     const { projectId } = params as { projectId: string };
-    const project = mockProjects.find((p) => p.id === projectId);
+    const project = mockProjects.find((p) => p.project_id === Number(projectId));
 
     if (!project) {
       return new HttpResponse(null, { status: 404 });

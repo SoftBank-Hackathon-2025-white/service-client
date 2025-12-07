@@ -25,11 +25,11 @@ export function ProjectListPage() {
 
     try {
       const project = await createProjectMutation.mutateAsync({
-        name: newProjectName.trim(),
+        project_name: newProjectName.trim(),
       });
       setIsModalOpen(false);
       setNewProjectName('');
-      navigate(getProjectPath(project.id));
+      navigate(getProjectPath(project.project_id.toString()));
     } catch (err) {
       console.error('Failed to create project:', err);
       alert('프로젝트 생성에 실패했습니다.');
@@ -100,7 +100,7 @@ export function ProjectListPage() {
             <SectionTitleWrapper>
               <FolderOpen size={24} />
               <SectionTitle>프로젝트</SectionTitle>
-              <ProjectCount>{data?.total || 0}개</ProjectCount>
+              <ProjectCount>{data?.length || 0}개</ProjectCount>
             </SectionTitleWrapper>
             <CreateButton onClick={() => setIsModalOpen(true)}>
               <Plus size={18} />새 프로젝트
@@ -108,17 +108,20 @@ export function ProjectListPage() {
           </SectionHeader>
 
           <ProjectGrid>
-            {data?.projects.map((project) => (
-              <ProjectCard key={project.id} onClick={() => navigate(getProjectPath(project.id))}>
+            {data?.map((project) => (
+              <ProjectCard
+                key={project.project_id}
+                onClick={() => navigate(getProjectPath(project.project_id.toString()))}
+              >
                 <ProjectHeader>
-                  <ProjectName>{project.name}</ProjectName>
-                  <ProjectId>{project.id}</ProjectId>
+                  <ProjectName>{project.project}</ProjectName>
+                  <ProjectId>{project.project_id}</ProjectId>
                 </ProjectHeader>
               </ProjectCard>
             ))}
 
             {/* 빈 상태 */}
-            {(!data?.projects || data.projects.length === 0) && (
+            {(!data || data.length === 0) && (
               <EmptyState>
                 <EmptyIcon>📁</EmptyIcon>
                 <EmptyTitle>프로젝트가 없습니다</EmptyTitle>

@@ -7,7 +7,7 @@ import type { Project, ProjectListResponse } from '../types/project';
  * 프로젝트 생성 요청 타입
  */
 export type CreateProjectRequest = {
-  name: string;
+  project_name: string;
 };
 
 /**
@@ -41,7 +41,7 @@ export const useProjects = () => {
  * 프로젝트 생성
  */
 export const createProject = async (request: CreateProjectRequest): Promise<Project> => {
-  const response = await client.post<Project>(API_ENDPOINTS.PROJECT_CREATE, request);
+  const response = await client.post<Project>(API_ENDPOINTS.PROJECT_CREATE + '?project_name=' + request.project_name);
   return response.data;
 };
 

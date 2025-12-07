@@ -48,10 +48,10 @@ export function ProjectDetailPage() {
 
   // 프로젝트 목록에서 현재 프로젝트 찾기
   const project = useMemo(() => {
-    if (!projectsData?.projects || !projectId) {
+    if (!projectsData || !projectId) {
       return null;
     }
-    return projectsData.projects.find((p) => p.id === projectId) || null;
+    return projectsData.find((p) => p.project_id === Number(projectId)) || null;
   }, [projectsData, projectId]);
 
   const handleSubmit = async () => {
@@ -152,7 +152,7 @@ export function ProjectDetailPage() {
         </HeaderTop>
         <HeaderTitle>
           <ProjectIcon>📁</ProjectIcon>
-          {project.name}
+          {project.project}
         </HeaderTitle>
       </Header>
 

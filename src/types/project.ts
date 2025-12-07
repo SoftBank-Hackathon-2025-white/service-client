@@ -2,17 +2,14 @@
  * 프로젝트 기본 정보
  */
 export type Project = {
-  id: string;
-  name: string;
+  project_id: number;
+  project: string;
 };
 
 /**
  * 프로젝트 목록 응답
  */
-export type ProjectListResponse = {
-  projects: Project[];
-  total: number;
-};
+export type ProjectListResponse = Project[];
 
 /**
  * 코드 제출 요청
