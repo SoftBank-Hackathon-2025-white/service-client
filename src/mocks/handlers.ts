@@ -161,7 +161,6 @@ export const handlers = [
    */
   http.get(`${BASE_URL}/api/projects/:projectId/dashboard`, ({ params }) => {
     const { projectId } = params as { projectId: string };
-    const project = mockProjects.find((p) => p.project_id === Number(projectId));
 
     const mockJobCount = 100 + Math.floor(Math.random() * 100);
     const response: ProjectDetailData = {
