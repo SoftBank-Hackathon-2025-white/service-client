@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import client from './_client';
 import { API_ENDPOINTS } from '../constants/api';
 import type { CodeSubmitRequest, CodeSubmitResponse } from '../types/project';
-import type { JobMetadata, JobStatusResponse } from '../types/whiteboard';
+import type { JobMetadata, JobStatusResponse, ExecutionLogResponse } from '../types/whiteboard';
 import { JobStatus } from '../types/whiteboard';
 
 /**
@@ -13,6 +13,7 @@ export const executionKeys = {
   jobs: (projectId: string) => ['executions', projectId, 'jobs'] as const,
   detail: (projectId: string, jobId: string) => ['executions', projectId, jobId] as const,
   status: (jobId: string) => ['executions', 'status', jobId] as const,
+  log: (logKey: string) => ['executions', 'log', logKey] as const,
 };
 
 /**
@@ -121,6 +122,8 @@ const fetchExecutionStatus = async (jobId: string) => {
     startedAt: data.started_at,
     completedAt: data.completed_at,
     timeoutMs: data.timeout_ms,
+    // 실행 완료 시 로그 키
+    logKey: data.log_key,
   };
 };
 
@@ -142,6 +145,43 @@ export const useExecutionStatus = (jobId: string | null, enabled = true, refetch
     },
     retry: false,
     staleTime: 0,
+  });
+};
+
+/**
+ * 로그 조회 API
+ * GET /api/log?log_key=XXX
+ * 응답: JSON string을 파싱하여 { stdout?, stderr? } 반환
+ */
+const fetchExecutionLog = async (logKey: string): Promise<ExecutionLogResponse> => {
+  const response = await client.get(API_ENDPOINTS.LOG(logKey));
+  const data = response.data;
+  
+  // string으로 받은 경우 JSON.parse 시도
+  if (typeof data === 'string') {
+    try {
+      return JSON.parse(data) as ExecutionLogResponse;
+    } catch (error) {
+      console.error('Failed to parse log data:', error);
+      // 파싱 실패 시 원본 string을 stdout으로 반환
+      return { stdout: data };
+    }
+  }
+  
+  // 이미 object인 경우 그대로 반환
+  return data as ExecutionLogResponse;
+};
+
+/**
+ * 로그 조회 React Query Hook
+ */
+export const useExecutionLog = (logKey: string | null | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: executionKeys.log(logKey || ''),
+    queryFn: () => fetchExecutionLog(logKey!),
+    enabled: enabled && !!logKey,
+    staleTime: 60000, // 1분간 캐시
+    retry: 1,
   });
 };
 

@@ -17,6 +17,8 @@ export const API_ENDPOINTS = {
   EXECUTE: (jobId: string) => `/api/execute/${jobId}`,
   /** 실행 상태 조회 */
   STATUS: (jobId: string) => `/api/jobs/${jobId}/status`,
+  /** 로그 조회 */
+  LOG: (logKey: string) => `/api/log?log_key=${encodeURIComponent(logKey)}`,
   /** CloudWatch 메트릭 조회 */
   CLOUDWATCH: (clusterName: string) => `/api/cloudwatch/${clusterName}`,
 } as const;

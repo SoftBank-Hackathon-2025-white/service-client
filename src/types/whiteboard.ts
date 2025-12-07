@@ -55,6 +55,17 @@ export type JobStatusResponse = {
   started_at?: string;
   completed_at?: string;
   timeout_ms: number;
+  // 실행 완료 시 로그 키
+  log_key?: string;
+};
+
+/**
+ * 로그 API 응답
+ * GET /api/log?log_key=XXX
+ */
+export type ExecutionLogResponse = {
+  stdout?: string;
+  stderr?: string;
 };
 
 export type SystemMetrics = {

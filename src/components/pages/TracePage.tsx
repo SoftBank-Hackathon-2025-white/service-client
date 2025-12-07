@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { useExecutionStatus } from '../../api/execution';
+import { AlertCircle, CheckCircle2, ArrowLeft, Terminal } from 'lucide-react';
+import { useExecutionStatus, useExecutionLog } from '../../api/execution';
 import { getProjectPath } from '../../constants/paths';
 import { UploadingStep } from '../pipeline/UploadingStep';
 import { QueuedStep } from '../pipeline/QueuedStep';
@@ -20,6 +20,13 @@ export function TracePage() {
 
   // 実行状態照会（1秒ごとにポーリング）
   const { data: executionInfo, isLoading } = useExecutionStatus(jobId || null, true, 1000);
+
+  // 実行完了時のみ、ログ照会
+  const isCompleted = executionInfo?.status === 'Success' || executionInfo?.status === 'Failed';
+  const { data: executionLog, isLoading: isLogLoading } = useExecutionLog(
+    executionInfo?.logKey,
+    isCompleted && !!executionInfo?.logKey
+  );
 
   const handleBackToProject = () => {
     if (projectId) {
@@ -152,6 +159,35 @@ export function TracePage() {
               </ErrorInfo>
             </ErrorContent>
 
+            {/* 失敗時のエラー出力 */}
+            {executionInfo?.logKey && (
+              <ErrorOutputSection>
+                {isLogLoading ? (
+                  <LogLoadingWrapper>
+                    <LogSpinner />
+                    <LogLoadingText>ログを読み込み中...</LogLoadingText>
+                  </LogLoadingWrapper>
+                ) : executionLog ? (
+                  <>
+                    {executionLog.stderr && (
+                      <>
+                        <OutputLabel $type="stderr">stderr</OutputLabel>
+                        <OutputContent $type="stderr">{executionLog.stderr}</OutputContent>
+                      </>
+                    )}
+                    {executionLog.stdout && (
+                      <>
+                        <OutputLabel $type="stdout">stdout</OutputLabel>
+                        <OutputContent $type="stdout">{executionLog.stdout}</OutputContent>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <LogErrorText>ログの読み込みに失敗しました</LogErrorText>
+                )}
+              </ErrorOutputSection>
+            )}
+
             <ErrorActions>
               <BackButton onClick={handleBackToProject}>プロジェクトに戻る</BackButton>
             </ErrorActions>
@@ -184,6 +220,44 @@ export function TracePage() {
               <SuccessSubtitle>コードが正常に実行されました</SuccessSubtitle>
             </SuccessHeader>
 
+            {/* 実行結果出力カード */}
+            {executionInfo?.logKey && (
+              <ExecutionOutputCard
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+              >
+                <OutputCardHeader>
+                  <Terminal size={20} />
+                  <OutputCardTitle>実行ログ</OutputCardTitle>
+                </OutputCardHeader>
+
+                {isLogLoading ? (
+                  <LogLoadingWrapper>
+                    <LogSpinner />
+                    <LogLoadingText>ログを読み込み中...</LogLoadingText>
+                  </LogLoadingWrapper>
+                ) : executionLog ? (
+                  <OutputSection>
+                    {executionLog.stdout && (
+                      <>
+                        <OutputLabel $type="stdout">stdout</OutputLabel>
+                        <OutputContent $type="stdout">{executionLog.stdout}</OutputContent>
+                      </>
+                    )}
+                    {executionLog.stderr && (
+                      <>
+                        <OutputLabel $type="stderr">stderr</OutputLabel>
+                        <OutputContent $type="stderr">{executionLog.stderr}</OutputContent>
+                      </>
+                    )}
+                  </OutputSection>
+                ) : (
+                  <LogErrorText>ログの読み込みに失敗しました</LogErrorText>
+                )}
+              </ExecutionOutputCard>
+            )}
+
             {/* Job情報カード */}
             <InfoCard initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
               <InfoCardHeader>
@@ -203,6 +277,12 @@ export function TracePage() {
                   <InfoLabel>ステータス</InfoLabel>
                   <StatusBadge>成功</StatusBadge>
                 </InfoItem>
+                {executionInfo?.logKey && (
+                  <InfoItem>
+                    <InfoLabel>ログキー</InfoLabel>
+                    <InfoValue>{executionInfo.logKey}</InfoValue>
+                  </InfoItem>
+                )}
                 {executionInfo?.createdAt && (
                   <InfoItem>
                     <InfoLabel>作成時間</InfoLabel>
@@ -497,6 +577,12 @@ const BackButton = styled.button`
   }
 `;
 
+const ErrorOutputSection = styled.div`
+  margin-top: ${(props) => props.theme.spacing.lg};
+  padding-top: ${(props) => props.theme.spacing.lg};
+  border-top: 1px solid ${(props) => props.theme.color.statusFailed}40;
+`;
+
 const InfoMessage = styled(motion.div)`
   margin-top: ${(props) => props.theme.spacing.xl};
   padding: ${(props) => props.theme.spacing.lg};
@@ -664,4 +750,127 @@ const FooterMessage = styled(motion.div)`
   text-align: center;
   font-size: ${(props) => props.theme.fontSize.sm};
   color: ${(props) => props.theme.color.baseColor6};
+`;
+
+/* ---------------- 実行結果出力スタイル ---------------- */
+
+const ExecutionOutputCard = styled(motion.div)`
+  background: ${(props) => props.theme.color.cardBackground};
+  backdrop-filter: blur(10px);
+  border-radius: ${(props) => props.theme.borderRadius['2xl']};
+  padding: ${(props) => props.theme.spacing.lg};
+  border: 1px solid ${(props) => props.theme.color.cardBorder};
+  box-shadow: ${(props) => props.theme.shadow.sm};
+  margin-bottom: ${(props) => props.theme.spacing.lg};
+`;
+
+const OutputCardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${(props) => props.theme.spacing.sm};
+  margin-bottom: ${(props) => props.theme.spacing.md};
+  color: ${(props) => props.theme.color.green1};
+`;
+
+const OutputCardTitle = styled.h3`
+  font-size: ${(props) => props.theme.fontSize.lg};
+  font-weight: 600;
+  color: ${(props) => props.theme.color.white};
+`;
+
+const OutputSection = styled.div`
+  margin-bottom: ${(props) => props.theme.spacing.md};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const OutputLabel = styled.div<{ $type: 'stdout' | 'stderr' }>`
+  display: inline-block;
+  font-size: ${(props) => props.theme.fontSize.xs};
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: ${(props) => props.theme.spacing.xs} ${(props) => props.theme.spacing.sm};
+  border-radius: ${(props) => props.theme.borderRadius.md};
+  margin-bottom: ${(props) => props.theme.spacing.sm};
+  background: ${(props) => (props.$type === 'stdout' ? props.theme.color.green1 : props.theme.color.statusFailed)};
+  color: ${(props) => props.theme.color.baseColor1};
+`;
+
+const OutputContent = styled.pre<{ $type: 'stdout' | 'stderr' }>`
+  background: ${(props) => props.theme.color.baseColor1};
+  border: 1px solid
+    ${(props) => (props.$type === 'stdout' ? props.theme.color.green1 + '40' : props.theme.color.statusFailed + '40')};
+  border-radius: ${(props) => props.theme.borderRadius.lg};
+  padding: ${(props) => props.theme.spacing.md};
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: ${(props) => props.theme.fontSize.sm};
+  color: ${(props) => (props.$type === 'stdout' ? props.theme.color.green1 : props.theme.color.statusFailed)};
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  line-height: 1.6;
+  margin: 0;
+
+  /* スクロールバースタイル */
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${(props) => props.theme.color.baseColor2};
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${(props) => props.theme.color.baseColor4};
+    border-radius: 4px;
+
+    &:hover {
+      background: ${(props) => props.theme.color.baseColor5};
+    }
+  }
+`;
+
+/* ---------------- ログ読み込みスタイル ---------------- */
+
+const LogLoadingWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: ${(props) => props.theme.spacing.xl};
+  gap: ${(props) => props.theme.spacing.md};
+`;
+
+const LogSpinner = styled.div`
+  width: 32px;
+  height: 32px;
+  border: 3px solid ${(props) => props.theme.color.baseColor3};
+  border-top-color: ${(props) => props.theme.color.green1};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const LogLoadingText = styled.p`
+  font-size: ${(props) => props.theme.fontSize.sm};
+  color: ${(props) => props.theme.color.baseColor6};
+`;
+
+const LogErrorText = styled.p`
+  padding: ${(props) => props.theme.spacing.md};
+  text-align: center;
+  color: ${(props) => props.theme.color.statusFailed};
+  font-size: ${(props) => props.theme.fontSize.sm};
 `;

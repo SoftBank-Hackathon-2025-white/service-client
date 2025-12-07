@@ -490,6 +490,10 @@ export const handlers = [
         ...(startedAt && { started_at: startedAt }),
         ...(completedAt && { completed_at: completedAt }),
         timeout_ms: 300000, // 5분
+        // 실행 완료 시 로그 키 포함
+        ...(completedAt && {
+          log_key: `logs/${jobId}.json`,
+        }),
       };
 
       return HttpResponse.json(response);
@@ -504,9 +508,90 @@ export const handlers = [
       started_at: new Date(Date.now() - 55000).toISOString(),
       completed_at: new Date().toISOString(),
       timeout_ms: 300000,
+      // 기존 Job도 로그 키 포함
+      log_key: `logs/${jobId}.json`,
     };
 
     return HttpResponse.json(response);
+  }),
+
+  /**
+   * 로그 조회
+   * GET /api/log?log_key=XXX
+   */
+  http.get(`${BASE_URL}/api/log`, ({ request }) => {
+    const url = new URL(request.url);
+    const logKey = url.searchParams.get('log_key');
+
+    if (!logKey) {
+      return new HttpResponse('log_key parameter is required', { status: 400 });
+    }
+
+    // 성공/실패를 랜덤으로 결정 (80% 성공)
+    const isSuccess = Math.random() > 0.2;
+
+    // Mock 로그 데이터 생성 (JSON 형식)
+    const mockLogData = isSuccess
+      ? {
+          stdout: `[2024-12-07 15:30:45] Starting execution...
+[2024-12-07 15:30:45] Initializing environment
+[2024-12-07 15:30:46] Loading dependencies...
+[2024-12-07 15:30:47] Dependencies loaded successfully
+[2024-12-07 15:30:47] ========================================
+[2024-12-07 15:30:47] Execution Output:
+[2024-12-07 15:30:47] ========================================
+Hello, World!
+Processing data...
+Item 1: Success
+Item 2: Success
+Item 3: Success
+...
+Item 1000: Success
+[2024-12-07 15:30:52] ========================================
+[2024-12-07 15:30:52] Execution completed successfully
+[2024-12-07 15:30:52] Total items processed: 1000
+[2024-12-07 15:30:52] Success rate: 100%
+[2024-12-07 15:30:52] Total execution time: 5.234s
+[2024-12-07 15:30:52] Memory usage: 128.5 MB
+[2024-12-07 15:30:52] CPU usage: 32.5%
+[2024-12-07 15:30:52] ========================================
+[2024-12-07 15:30:52] Cleaning up resources...
+[2024-12-07 15:30:52] All resources released
+[2024-12-07 15:30:52] Job completed: ${logKey}`,
+        }
+      : {
+          stderr: `[2024-12-07 15:30:45] Starting execution...
+[2024-12-07 15:30:45] Initializing environment
+[2024-12-07 15:30:46] Loading dependencies...
+[2024-12-07 15:30:47] Dependencies loaded successfully
+[2024-12-07 15:30:47] ========================================
+[2024-12-07 15:30:47] Execution Output:
+[2024-12-07 15:30:47] ========================================
+Processing data...
+Item 1: Success
+Item 2: Success
+[2024-12-07 15:30:48] ERROR: Unexpected error occurred
+[2024-12-07 15:30:48] ========================================
+[2024-12-07 15:30:48] Error Details:
+[2024-12-07 15:30:48] ========================================
+Traceback (most recent call last):
+  File "main.py", line 42, in process_data
+    result = dangerous_operation()
+  File "main.py", line 28, in dangerous_operation
+    raise ValueError("Invalid input data")
+ValueError: Invalid input data
+[2024-12-07 15:30:48] ========================================
+[2024-12-07 15:30:48] Execution failed
+[2024-12-07 15:30:48] Job failed: ${logKey}`,
+        };
+
+    // JSON string으로 반환
+    return new HttpResponse(JSON.stringify(mockLogData), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }),
 
   /**
