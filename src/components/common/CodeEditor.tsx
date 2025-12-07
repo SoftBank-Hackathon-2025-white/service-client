@@ -10,7 +10,7 @@ const guideAnnotation = {
 const exampleCode: Record<string, string> = {
   python: 'print("Hello, Lambda the Sea!")',
   node: 'console.log("Hello, Lambda the Sea!");',
-  java: 'public static void main(String[] args) { System.out.println("Hello, Lambda the Sea!"); }',
+  java: 'class Main { public static void main(String[] args) { System.out.println("Hello World from Java!"); }}',
 };
 interface CodeEditorProps {
   value: string;
